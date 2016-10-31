@@ -15,6 +15,7 @@ package com.insdata.oop1;
     //stav
     boolean svieti;
 
+    //funkcieSaPisuMalymZaciatocnymPismenomADalejCamelCase
     //spravanie mozem zapnut alebo vypnut
     public void zapni(){
         svieti = true;
