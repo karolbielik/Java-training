@@ -5,7 +5,7 @@ package com.insdata.oop1;
  */
 
 //Triery(Objekty) Sa Pisu Velkym Zaciatocnym Pismenom  A Z Pravidla Su Podstatne Meno
-/*public*/ public class Lampa {
+/*public*/ class Lampa {
 
     //konstruktor triedy
     Lampa(){
@@ -17,11 +17,11 @@ package com.insdata.oop1;
 
     //funkcieSaPisuMalymZaciatocnymPismenomADalejCamelCase
     //spravanie mozem zapnut alebo vypnut
-    public void zapni(){
+    public void zapniLampu(){
         svieti = true;
     }
 
-    public void vypni(){
+    public void vypniLampu(){
         svieti = false;
     }
 }

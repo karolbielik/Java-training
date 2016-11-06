@@ -3,14 +3,15 @@ package com.insdata.oop1;
 /**
  * Created by karol.bielik on 31. 10. 2016.
  */
-public class Main {
+public class Vypinac {
     public static void main(String[] args) {
-        Lampa lampa = new Lampa();
+        Lampa lampa;
+        lampa = new Lampa();
         System.out.println("svieti:"+lampa.svieti);
-        lampa.zapni();
+        lampa.zapniLampu();
         System.out.println("zapni");
         System.out.println("svieti:"+lampa.svieti);
-        lampa.vypni();
+        lampa.vypniLampu();
         System.out.println("vypni");
         System.out.println("svieti:"+lampa.svieti);
     }
