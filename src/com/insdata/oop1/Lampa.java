@@ -5,23 +5,27 @@ package com.insdata.oop1;
  */
 
 //Triery(Objekty) Sa Pisu Velkym Zaciatocnym Pismenom  A Z Pravidla Su Podstatne Meno
-/*public*/ class Lampa {
+public class Lampa {
 
     //konstruktor triedy
-    Lampa(){
+    public Lampa(){
         svieti = false;
     }
 
     //stav
     boolean svieti;
 
+//    public int x = 1;
+
     //funkcieSaPisuMalymZaciatocnymPismenomADalejCamelCase
     //spravanie mozem zapnut alebo vypnut
     public void zapniLampu(){
         svieti = true;
+        System.out.println("lampa svieti:"+svieti);
     }
 
     public void vypniLampu(){
         svieti = false;
+        System.out.println("lampa svieti:"+svieti);
     }
 }
