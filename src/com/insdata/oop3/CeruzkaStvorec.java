@@ -13,5 +13,6 @@ public class CeruzkaStvorec implements Ceruzka {
         System.out.println(stvorec.kresliVypln());
 
         //refactoring => kreslitvar s parametrom Tvar na abstract triede a metode
+        //medzi Ceruzka interface a CeruzkaStvorec vlozim este abstractnu triedu napr. CeruzkaImpl majucu kresliTvar(Tvar tvar)
     }
 }
