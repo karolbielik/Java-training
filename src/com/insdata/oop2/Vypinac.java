@@ -32,11 +32,12 @@ public class Vypinac {
         lampa2.zapniLampu();
         lampa2.vypniLampu();
 
+        //nekompatibilne typy, su z jednej hierarchyckej urovne dedenia, obaja su priamy potomkovia Lampa
+//        DiscoGula dg = new Lampa();
+//        DiscoGula discoGula1 = new Majak();
+
 //        System.out.println(lampa1.x);
 //        System.out.println(lampa2.x);
-
-        //nekompatibilne typy, su z jednej hierarchyckej urovne dedenia, obaja su priamy potomkovia Lampa
-//        DiscoGula discoGula1 = new Majak();
 
     }
 }
