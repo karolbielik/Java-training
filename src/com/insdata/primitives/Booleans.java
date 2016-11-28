@@ -10,7 +10,7 @@ public class Booleans {
         System.out.println((new Booleans()).defaultBoolean );
 
         boolean b1 = true;//false
-        //boolean b2 = 0;//compilation error
+//        boolean b2 = 0;//compilation error
 
         //stack variables need to be initialized
         boolean notInitBool;

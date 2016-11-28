@@ -23,6 +23,8 @@ public class Numbers {
         System.out.println("byte = 127 + 1:"+b);
         System.out.println();
 
+        int res = Math.addExact(2147483647, 1);
+
         float f = 14.23f;//mozna strata precission(desatin)
         double d = 14.23;
 //      float ff = 999999999999999999999999999999999999999.999f;//floating point number too large
@@ -45,7 +47,7 @@ public class Numbers {
         //binary
         int binaryInt = 0b10000000;
 //        byte binaryByte1 = 0b10000000;
-        byte binaryByte = 0b0111111;
+        byte binaryByte = 0B0111111;
         System.out.println("Binary:");
         System.out.println("0b10000000:"+binaryInt);
     }

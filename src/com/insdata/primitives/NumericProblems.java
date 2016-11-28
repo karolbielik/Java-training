@@ -9,8 +9,10 @@ public class NumericProblems {
     public static void main(String[] args) {
         float f1 = (float) (0.1 * 0.1);
         float f2 = 0.1f * 0.1f;
+        double d1 = 0.1 * 0.1 * 0.1;
         System.out.println("double result to float:"+f1);
         System.out.println("floats result:"+f2);
+        System.out.println("double result:"+d1);
         System.out.println("compare float results:"+(f1 == f2));
 
         System.out.println();
