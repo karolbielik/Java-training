@@ -1,7 +1,5 @@
 package com.insdata.wrappers;
 
-import com.insdata.primitives.Booleans;
-
 /**
  * Created by key on 10.12.2016.
  */
