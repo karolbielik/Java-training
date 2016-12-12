@@ -8,7 +8,7 @@ public class WrappersConstruction {
     public static void main(String[] args) {
         //ucel preco existuju wrappery
         //(A) - pouzitie v kolekciach, alebo v navratovych typoch kompatibilnych typu Object
-        Object retPrim = retPrimitive();
+        Object retPrim = retWrappedPrimitive();
 
         //(B) - wrappery poskytuju rozne funkcionality napr. prevod primitivov z/na String alebo
         //prevod do inych ciselnych sustav, konverzie na ine primitivne typy
@@ -44,7 +44,7 @@ public class WrappersConstruction {
         int parsedInt = Integer.parseInt("34");
         int parsedFromBinary = Integer.parseInt("00111100", 2);
 
-        //konverzne utility
+        //konverzne utility xxxValue()
         Integer i4 = new Integer(55);
         byte b5 = i4.byteValue();
         int i5 = i4.intValue();
@@ -82,20 +82,16 @@ public class WrappersConstruction {
         System.out.println("ii1==ii2:"+(ii1==ii2));
         System.out.println("ii1==ii2:"+(ii1.equals(ii2)));
         System.out.println("ii1==ll1:"+(ii1.equals(ll1)));
-        //== vyhodnoti dva objekty ako rovnake v pripade boxingu ak je Boolean, Byte, Charakter of 0 do 127, Short a Integer of -128 po 127
+        //== vyhodnoti dva objekty ako rovnake v pripade boxingu ak je Boolean, Byte, Charakter od 0 do 127, Short a Integer of -128 po 127
 
         //ale
         ii1 = new Integer(10);
         ii2 = new Integer(10);
         System.out.println("2/ ii1==ii2:"+(ii1==ii2));
 
-
-
-
-
     }
 
-    private static Object retPrimitive(){
+    private static Object retWrappedPrimitive(){
         byte b = 1;
         return b;
     }
