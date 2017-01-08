@@ -1,5 +1,8 @@
 package com.insdata.wrappers;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 /**
  * Created by key on 10.12.2016.
  */
@@ -8,7 +11,7 @@ public class WrappersConstruction {
     public static void main(String[] args) {
         //ucel preco existuju wrappery
         //(A) - pouzitie v kolekciach, alebo v navratovych typoch kompatibilnych typu Object
-        Object retPrim = retPrimitive();
+        Object retPrim = retWrappedPrimitive((byte)2);
 
         //(B) - wrappery poskytuju rozne funkcionality napr. prevod primitivov z/na String alebo
         //prevod do inych ciselnych sustav, konverzie na ine primitivne typy
@@ -20,7 +23,7 @@ public class WrappersConstruction {
         Integer i1 = new Integer("33");
 
         Float f = new Float(12.3f);
-        Float f1 = new Float("12.3");//f nieje povinne
+        Float f1 = new Float("12.3f");//f nieje povinne
 
         Boolean b = new Boolean("FaLsE");
         Boolean b1 = new Boolean(true);
@@ -32,6 +35,7 @@ public class WrappersConstruction {
         //vrati referenciu na ten isty objekt
         Boolean b3 = Boolean.valueOf(true);
         Boolean b4 = Boolean.valueOf(true);
+        Boolean b7 = Boolean.TRUE;
 
         //pre celociselne vracia ten isty objekt(z cache) len pre byte rozsah
         Integer i2 = Integer.valueOf(-128);
@@ -44,7 +48,7 @@ public class WrappersConstruction {
         int parsedInt = Integer.parseInt("34");
         int parsedFromBinary = Integer.parseInt("00111100", 2);
 
-        //konverzne utility
+        //konverzne utility xxxValue()
         Integer i4 = new Integer(55);
         byte b5 = i4.byteValue();
         int i5 = i4.intValue();
@@ -54,6 +58,8 @@ public class WrappersConstruction {
         System.out.println("i4 hodnota je:"+i4.toString());
         System.out.println("i5 hodnota je:"+Integer.toString(i5));
         System.out.println("i5 hex hodnota je:"+Integer.toHexString(i5));
+        NumberFormat nf = NumberFormat.getInstance(new Locale("sk", "SK"));
+        System.out.println("formated number:"+ nf.format(10000222)+" "+nf.getCurrency());
 
         //boxing, unboxing od java 5 => tam kde je potrebne java automaticky prevadza wrapper typ na primitivny a opacne.
 
@@ -76,27 +82,24 @@ public class WrappersConstruction {
         //pouzitie == / equals
         //== porovnava ci premenne ukazuju na ten isty objekt
         //equals ak su dva objekty rovnakeho typu a maju rovnaku hodnotu
-        Integer ii1 = 10;
-        Integer ii2 = 10;
+        Integer ii1 = 1000;
+        Integer ii2 = 1000;
         Long ll1 = 10L;
+        Long ll2 = 10L;
         System.out.println("ii1==ii2:"+(ii1==ii2));
         System.out.println("ii1==ii2:"+(ii1.equals(ii2)));
         System.out.println("ii1==ll1:"+(ii1.equals(ll1)));
-        //== vyhodnoti dva objekty ako rovnake v pripade boxingu ak je Boolean, Byte, Charakter of 0 do 127, Short a Integer of -128 po 127
+        //== vyhodnoti dva objekty ako rovnake v pripade boxingu ak je Boolean, Byte, Charakter od 0 do 127, Short a Integer of -128 po 127
 
         //ale
         ii1 = new Integer(10);
         ii2 = new Integer(10);
         System.out.println("2/ ii1==ii2:"+(ii1==ii2));
 
-
-
-
-
     }
 
-    private static Object retPrimitive(){
-        byte b = 1;
+    private static Object retWrappedPrimitive(Byte b){
+//        byte b = 1;
         return b;
     }
 
