@@ -74,6 +74,12 @@ public class ArrayTest {
                 System.out.println(ref[j]);
             }
         }
+        //zjednoduseny zapis
+        for (int[] ref : pole1_1) {
+            for (int j: ref) {
+                System.out.println(j);
+            }
+        }
 
         //Obj referencie a polia
         Car[] cars = {new Car(), new Car()};
@@ -86,7 +92,7 @@ public class ArrayTest {
         Arrays.asList(new String[]{"a", "b", "c"});
         String[] objArr = {"a", "b", "c"};
         System.out.println("Binarysearch:" + Arrays.binarySearch(objArr, "b"));
-        String[] objCopy = Arrays.copyOf(objArr, 3);//vrati kopiu pola s pozadovanou dlzkou ci uz s odrezanou alebo pridanou(null) init hodnotou
+        String[] objCopy = Arrays.copyOf(objArr, 5);//vrati kopiu pola s pozadovanou dlzkou ci uz s odrezanou alebo pridanou(null) init hodnotou
         boolean isDeepEqual = Arrays.deepEquals(objArr, objCopy);
         boolean isEqual = Arrays.equals(objArr, objCopy);
         String[] objArr1 = new String[3];
@@ -101,6 +107,9 @@ public class ArrayTest {
         //Arrays.spliterator(arrCalc); //v java 8 pre paralelne spracovanie dat mozne pouzit v java 7 fork/join framework
         //Arrays.stream(arrCalc);//v java 8 mozno vyuzit pracu so stream-ami
         System.out.println(Arrays.toString(arrCalc));
+
+        //ine pomocne implementacie pre pracu s poliami => nieje sucastou SDK => samostudium
+        //https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/ArrayUtils.html
     }
 
     private static void dajMiPole(int[] pole) {
