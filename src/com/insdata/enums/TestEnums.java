@@ -52,6 +52,9 @@ public class TestEnums {
         //ordinalna hodnota enum
         System.out.println("poradova hodnota enumu:"+pondelok1.ordinal());
 
+        //pristup k enum konstante pomocou indexu
+        EnumDefinovanieAkoTrieda e = EnumDefinovanieAkoTrieda.values()[0];
+
         //vracia metadata enum triedy
         System.out.println("getDeclaringClass:"+utorok2.getDeclaringClass().getSimpleName());
 

@@ -5,7 +5,7 @@ package com.insdata.enums;
  */
 //nemoze byt len default alebo public ale nie protected alebo private
 public enum EnumDefinovanieAkoTrieda {
-    //enum je specialny data typ ktory sluzi na preddefinovat premenne ako konstanty
+    //enum je specialny data typ ktory sluzi na preddefinovanie premenne ako konstanty
     //pretoze su konstanty piseme ich kapitalkami
 
     //poradie prvkov enum je dolezite, podla tohto dostava su prvky zoradene

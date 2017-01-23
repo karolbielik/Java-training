@@ -7,7 +7,12 @@ import java.util.Properties;
  */
 public enum ConfiguraciaPomocouEnum {
     APPLICATION("ApplicationName"),
-    HOST_NAME("HostName"),
+    HOST_NAME("HostName"){
+        @Override
+        public String getValue() {
+            return "Moj hostik";
+        }
+    },
     SERVER_IP("ServerIP");
 
     String key;
