@@ -11,7 +11,7 @@ public class ExceptionHandling {
     public static void main(String[] args) {
         ExceptionHandling eksHand = new ExceptionHandling();
         try{
-            //tento riadok vyhodi exception, ktora musi byt handlovana
+            //tento riadok vyhodi exception, ktora musi byt handlovana lebo dedi z Exception
             eksHand.vyhodMojuEksepsnu(Boolean.TRUE);
             //tento sa kvoli tomu preskoci a ide do catch bloku
             eksHand.vyhodRuntimeEksepsnu(5);
@@ -19,7 +19,7 @@ public class ExceptionHandling {
             //po odchyteni exception sa exception dalej nepropaguje a kod pokracuje dalej
             System.out.println(meks.getMessage());
         }
-        //toto sa vykona a vyhodi runtime exception, ktora nemusi byt handlovana
+        //toto sa vykona a vyhodi runtime exception, ktora nemusi byt handlovana, lebo dedi z RuntimeException
         eksHand.vyhodRuntimeEksepsnu(4);
 
         eksHand.vyhodError();
