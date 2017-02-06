@@ -4,7 +4,7 @@ package com.insdata.strings.bufferAndBuilder;
  * Created by key on 5.2.2017.
  */
 public class StringBuffers {
-    //pouzivame v pripade ak potrebujeme na stringu robit vecsie mnozstvo modifikacii
+    //pouzivame v pripade ak potrebujeme na stringu robit vacsie mnozstvo modifikacii
     //a nechceme skoncit pri velkom mnozstve nereferencovanych String objektov
 
     //StringBuffer nieje synchronizovany teda je rychlejsi ako StringBuilder

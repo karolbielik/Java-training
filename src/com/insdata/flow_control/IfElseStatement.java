@@ -21,12 +21,13 @@ public class IfElseStatement {
 
         //zatvorky nemusim pisat ak je za vyrazom jeden prikaz, ktory sa ma vykonat
         //pre lepsiu citatelnost sa odporuca zatvorky pouzivat
-        if(i<4)
-            System.out.println("i<4");
+        if(i>4)
+            System.out.println("i>4");
         else
-            System.out.println("i>=4");
+            System.out.println("i<=4");
 
         //pocet else if statementov nieje obmedzeny, musia vsak nasledovat po if, alebo po inom else if
+        i=1;
         if(i==4){
             System.out.println("i==4");
         }else if(i==3) {

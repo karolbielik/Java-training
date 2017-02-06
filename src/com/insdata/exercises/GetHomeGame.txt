@@ -1,9 +1,11 @@
 Get Home:
 Slovna hra, v ktorej sa do pola vygeneruju smery cesty s konecnym cielom.
-Smery su definovane nasledovne:dolava(l),doprava(r),hore(u),dole(d).
-Hrac si moze urcit dlzku cesty, v pripade ze neurci, tak ma cesta default dlzku 4 kroky.
-Kroky musia byt generovane tak, aby sa cesta nemohla spajat. To znamena ze nesmu v poly
+Smery su definovane nasledovne:dolava(l),doprava(r),rovno(f).
+Hrac si moze urcit dlzku cesty, v pripade ze neurci, tak ma cesta default dlzku
+4 kroky.
+Kroky musia byt generovane tak, aby sa cesta nemohla spajat. To znamena ze nesmu v poli
 existovat 3 po sebe nasledujuce kroky toho isteho typu napr. 3xr.
-Hrac musi uhadnut kazdy nasledujuci smer(krok) tak, ze zada jeden z prikazou l,r,u,d, ktory urcuju smer
-nasledujuceho kroku.
-Po dosiahnuti ciela sa vypise pocet pokusov potrebnych na dosiahnutie ciela ako aj cela cesta.
+Hrac musi uhadnut kazdy nasledujuci smer(krok) tak, ze zada jeden z prikazov l,r,f
+ktory urcuju smer nasledujuceho kroku.
+Po dosiahnuti ciela sa vypise pocet pokusov potrebnych na dosiahnutie ciela
+ako aj cela cesta.

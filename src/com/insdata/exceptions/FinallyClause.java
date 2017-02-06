@@ -18,7 +18,7 @@ public class FinallyClause {
         }
 
         System.out.println("----------------------vykonajKodAPropagujVynimkuDalej----------------");
-//        fc.vykonajKodAPropagujVynimkuDalej();
+        fc.vykonajKodAPropagujVynimkuDalej();
 
         try {
             System.out.println("----------------------vyhodSpecifickuVynimku----------------");
@@ -36,7 +36,7 @@ public class FinallyClause {
         try {
             System.out.println("----------------------vyhodSpecifickuVynimku Java7----------------");
             fc.vyhodSpecifickuVynimku(2);
-        }catch (MojaEksepsna | MojaEksepsnaDva mex) {
+        }catch ( MojaEksepsna | MojaEksepsnaDva mex) {
             mex.printStackTrace();
         }
 
@@ -54,6 +54,7 @@ public class FinallyClause {
     private void handlujAVyhodEksepsnu() throws MojaEksepsna{
         //try nemoze stat osamote bez catch alebo finally
         try {
+
             vyhodEksepsnu();
             System.out.println("ja sa nikdy nevypisem");
         }catch (MojaEksepsna mex){ //catch musi is vzdy za try, ale moze absentovat
@@ -99,6 +100,7 @@ class MojaEksepsnaDva extends Exception{
 class MojaCloasableClass implements Closeable{
     @Override
     public void close() throws IOException {
+        //zavri subor
         System.out.println(".......uvolujem vsetky zdroje mojej closable triedy");
     }
 

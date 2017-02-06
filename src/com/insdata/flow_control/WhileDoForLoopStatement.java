@@ -114,8 +114,11 @@ public class WhileDoForLoopStatement {
         //continue prerusi danu iteraciu cyklu a pokracuje v dalsej iteracii toho isteho cyklu
         for(int i1=0;i1<4;i1++){
             for(int j1=0;j1<4;j1++){
-                if(j1%2==0)
-                System.out.println("Vypisem iba parne cisla!:"+j1);
+                if(j1%2==0){
+                    System.out.println("Vypisem iba parne cisla!:"+j1);
+                    continue;
+                }
+                System.out.println("Vypisem iba neparne cisla!:"+j1);
             }
             System.out.println("Vypisem sa 4 krat.");
         }

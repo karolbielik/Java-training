@@ -1,5 +1,6 @@
 package com.insdata.enums;
 
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -23,7 +24,8 @@ public enum ConfiguraciaPomocouEnum {
             //toto sa nemusi robit pri loadovani clasy, teda staticky, ale moze to byt napr. aj pri starte aplikacie
             properties.load(ConfiguraciaPomocouEnum.class.getClassLoader().getResourceAsStream(
                     "com/insdata/enums/config.properties"));
-        } catch (Exception e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException("Error when loading configuration file", e);
         }
     }

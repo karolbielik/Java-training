@@ -7,7 +7,7 @@ public class Strings {
 
     public static void main(String[] args) {
         //String je final trieda, teda neda sa rozsirovat
-        //String je immutable, to znamena, ze ked raz nastavym na objekte string hodnotu, neviem ju menit
+        //String je immutable, to znamena, ze ked raz nastavim na objekte string hodnotu, neviem ju menit
 
         String s = "abc";
         System.out.println("s identity:"+System.identityHashCode(s));

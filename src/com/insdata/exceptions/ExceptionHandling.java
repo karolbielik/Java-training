@@ -8,7 +8,7 @@ public class ExceptionHandling {
     //runtime exception => dedi z RuntimeException => je to vynimka ktora je spojena napr. s chybou v kode. napr. NullPointerException. Nemusi byt handlovana, ale propaguje sa az do hlavnej metody a program terminuje
     //user exception => dedi z Exception => je nutne ju vzdy handlovat a je spojena napr. s vynimkou v busines logike aplikacii.
 
-    public static void main(String[] args) {
+    public static void main(String[] args){
         ExceptionHandling eksHand = new ExceptionHandling();
         try{
             //tento riadok vyhodi exception, ktora musi byt handlovana lebo dedi z Exception
@@ -33,7 +33,7 @@ public class ExceptionHandling {
 
     private void vyhodRuntimeEksepsnu(int parameter) /*throws IllegalArgumentException niejo povinne uviest a handlovat lebo je to runtime exception*/{
         if(parameter>5){
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("spravna hodnota je x<5");
         }else{
             throw new MojaRuntimeEksepsna();
         }
