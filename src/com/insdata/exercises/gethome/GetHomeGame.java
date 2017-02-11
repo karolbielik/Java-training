@@ -13,7 +13,7 @@ public class GetHomeGame {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         System.out.println("-------------------Get HOME nova hra--------------------------");
-        System.out.print("Zadaj dlzku cesty:");
+        System.out.println("Zadaj dlzku cesty:");
         boolean cestaOK = false;
 
         Cesta cesta = new Cesta();
@@ -27,20 +27,23 @@ public class GetHomeGame {
                 cestaOK = true;
             } catch (NeznamyPrikazException | DlzkaCestyException e) {
                 System.out.println(e.getMessage());
-                System.out.print("Zadaj dlzku cesty znova.");
+                System.out.print("Zadaj dlzku cesty znova:");
             }
         }
 
 
-        System.out.print("Zadaj krok(r,l,f):");
+        System.out.println("Zadaj krok(r,l,f):");
         while (!cesta.jeKoniecCesty()) {
             try {
                 Krok k = InterpreterPrikazov.dekodujKrok(br.readLine());
                 if(chodec.robimKrok(k)){
                     System.out.println("Krok "+k.toString()+" uspesne spraveny.");
+                    if(!cesta.jeKoniecCesty()){
+                        System.out.println("Zadaj dalsi krok:");
+                    }
                 }else{
                     System.out.println("Krok "+k.toString()+" nebol mozny.");
-                    System.out.print("Zadaj krok(r,l,f):");
+                    System.out.println("Zadaj krok(r,l,f):");
                 }
             }catch (NeznamyPrikazException nzpex){
                 System.out.println(nzpex.getMessage());
