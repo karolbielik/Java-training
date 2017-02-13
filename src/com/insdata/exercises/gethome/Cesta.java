@@ -1,5 +1,7 @@
 package com.insdata.exercises.gethome;
 
+import com.insdata.exercises.gethome.exceptions.DlzkaCestyException;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -16,7 +18,7 @@ public class Cesta {
         return dlzkaCesty;
     }
 
-    public Cesta nastavDlzkuCesty(int dlzkaCesty) throws DlzkaCestyException{
+    public Cesta nastavDlzkuCesty(int dlzkaCesty) throws DlzkaCestyException {
         if(dlzkaCesty<1 || dlzkaCesty>5){
             throw new DlzkaCestyException(1,5);
         }

@@ -1,5 +1,8 @@
 package com.insdata.exercises.gethome;
 
+import com.insdata.exercises.gethome.exceptions.DlzkaCestyException;
+import com.insdata.exercises.gethome.exceptions.NeznamyPrikazException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

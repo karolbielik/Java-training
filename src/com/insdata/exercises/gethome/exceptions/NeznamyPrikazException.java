@@ -1,4 +1,4 @@
-package com.insdata.exercises.gethome;
+package com.insdata.exercises.gethome.exceptions;
 
 /**
  * Created by key on 10.2.2017.

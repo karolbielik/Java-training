@@ -1,11 +1,13 @@
 package com.insdata.exercises.gethome;
 
+import com.insdata.exercises.gethome.exceptions.NeznamyPrikazException;
+
 /**
  * Created by key on 10.2.2017.
  */
 public class InterpreterPrikazov {
 
-    public static Krok dekodujKrok(String prikaz) throws NeznamyPrikazException{
+    public static Krok dekodujKrok(String prikaz) throws NeznamyPrikazException {
         switch (prikaz){
             case "r":
                 return new KrokDoprava();
