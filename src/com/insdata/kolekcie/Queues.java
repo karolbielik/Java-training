@@ -22,6 +22,7 @@ public class Queues {
             @Override
             public int compare(Object o, Object t1) {
                 return ((Integer)t1).compareTo(((Integer)o));
+//                return ((Integer)t1) - ((Integer)o);
             }
         });
 
