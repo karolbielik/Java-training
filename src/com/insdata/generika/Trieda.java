@@ -12,6 +12,7 @@ public class Trieda<E,T extends Number> {
         ArrayList<String> arr = new ArrayList<>();
         arr.add("Hello");
         Trieda<String, Integer> cls = new Trieda<>(arr, 2);
+        Trieda<String, Double> cls1 = new Trieda<>(arr, new Double(0));
 
         String hello = cls.dajPrvyPrvok();
         System.out.println(hello);

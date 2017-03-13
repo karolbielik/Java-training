@@ -3,7 +3,7 @@ package com.insdata.kolekcie;
 /**
  * Created by key on 18.2.2017.
  */
-public class Item {
+public class Item implements Comparable<Item>{
 
     Integer firstElement;
     String secondElement;
@@ -36,8 +36,8 @@ public class Item {
 
         Item item = (Item) o;
 
-        if (firstElement != null ? !firstElement.equals(item.firstElement) : item.firstElement != null) return false;
-        return secondElement != null ? secondElement.equals(item.secondElement) : item.secondElement == null;
+        if (!firstElement.equals(item.firstElement)) return false;
+        return secondElement.equals(item.secondElement);
 
     }
 
@@ -54,5 +54,11 @@ public class Item {
                 "firstElement=" + firstElement +
                 ", secondElement='" + secondElement + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Item o) {
+        return this.firstElement.compareTo(o.firstElement);
+//        return this.firstElement - o.firstElement;
     }
 }

@@ -12,7 +12,6 @@ public class Queues {
         PriorityQueue priorityQueue = new PriorityQueue();
         int[] prvkyArr = new int[]{5,4,3,1,2,6,7,9,8};
 
-        //iterator negarantuje zoradenie
         for(Integer prvok : prvkyArr){
             priorityQueue.offer(prvok);
         }

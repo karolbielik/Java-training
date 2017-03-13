@@ -21,7 +21,7 @@ public class Kolekcia {
 //        ArrayList<Object> genericky3 = new ArrayList<Integer>();//NOK
 //        ArrayList<Number> genericky4 = new ArrayList<Integer>();//NOK
 //        ArrayList<Rodic> genericky5 = new ArrayList<Dieta>();//NOK
-        ArrayList<Rodic> genericky6 = new ArrayList<Rodic>();//OK
+        ArrayList<Rodic> genericky6 = new ArrayList<>();//OK
 
         //ale pole moze obsahovat kompatibilne prvky
         genericky6.add(new Dieta());

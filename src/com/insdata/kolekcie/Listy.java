@@ -21,15 +21,15 @@ public class Listy {
     public static void main(String[] args) {
 
         //----------------ArrayList----------------
-        //pouziva sa v pripade ked potrebujem robit rychle iterovanie, alebo rundom pristup k prvkom
+        //pouziva sa v pripade ked potrebujem robit rychle iterovanie, alebo random pristup k prvkom
         //zoznam je zoradeny(pomocou indexu, ma get(index) metodu), nesortovany
         ArrayList arrayList = new ArrayList();
         arrayList.add(new Item(1,"jedna"));
         arrayList.add(new Item(3, "tri"));
         arrayList.add(new Item(4, "styri"));
         arrayList.add(1, new Item(2, "dva"));
-        for(Object item : arrayList){
-            Item itm = (Item)item;
+        for(int i =0; i< arrayList.size();i++){
+            Item itm = (Item)arrayList.get(i);
             System.out.print("nr:"+itm.getFirstElement()+",text:"+itm.getSecondElement());
             System.out.println();
         }
@@ -48,12 +48,13 @@ public class Listy {
             Item item = (Item)it.next();
             if(i==1 || i == 3){
                 //toto vyhodi ConcurrentModificationException
-//                arrayList.remove(item);
+//                arrayList1.remove(item);
                 //mieste toho pouzije na iteratore metodu remove alebo CopyOnWriteArrayList
                 it.remove();
             }
             i++;
         }
+        System.out.println(arrayList1.toString());
 
         //----------------CopyOnWriteArrayList----------------
         //List specialneho urcenia
@@ -89,6 +90,7 @@ public class Listy {
         //pouziva sa ked potrebujem robit velke mnozstvo insertov a deletov
         //prvky su zoradene index poziciou, prvok je zlinkovany s prvkom pred a za
         //vhodny pre implementaciu stack alebo queue
+        //implementuje interface Queue, Dequeue
         System.out.println();
         LinkedList linkedList = new LinkedList();
         //prida nakoniec

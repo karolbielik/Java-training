@@ -51,7 +51,7 @@ public class Metoda {
     //teda ak mi tam pride ArrayList<Rodic> tak Dcera je kompatibilna
     private void vypisList3(ArrayList<? super Dcera> list){
         list.add(new Dcera());//OK
-        //list.add(new Rodic());//NOK
+//        list.add(new Rodic());//NOK
     }
 
     private <T extends Rodic> T spracujData(T data){

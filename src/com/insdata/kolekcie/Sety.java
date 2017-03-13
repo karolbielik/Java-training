@@ -15,7 +15,7 @@ public class Sety {
 
     public static void main(String[] args) {
         //----------------HashSet-------------------
-        //nesortovany(nema metodu get(index)), nezoradeny
+        //nesortovany, nezoradeny => pri iteracii sa negarantuje poradie
         //na umiestnovanie prvkov pouziva metodu hashCode() elementu
         System.out.println();
         HashSet hashSet = new HashSet();
@@ -26,7 +26,7 @@ public class Sety {
 
 
         //-------------------LinkedHashSet-------------------
-        //je zoradena verzia HashSetu, nesortovany
+        //je zoradena verzia HashSetu, nesortovany => pri iteracii sa garantuje poradie
         System.out.println();
         LinkedHashSet linkedHashSet = new LinkedHashSet();
         linkedHashSet.add(new Item(1,"jedna"));
@@ -35,8 +35,8 @@ public class Sety {
         System.out.println("Vypis linkedHashSet:"+hashSet.toString());
 
         //-------------------TreeSet-------------------
-        //zoradeny => implementuje SortedSet
-        //zoradeny defaultne vzostupne
+        //sortovany => implementuje SortedSet
+        //sortovany defaultne vzostupne
         System.out.println();
         TreeSet treeSet = new TreeSet();
         treeSet.add(new Integer(3));
@@ -44,16 +44,22 @@ public class Sety {
         treeSet.add(new Integer(1));
         System.out.println("Vypis treeSet:"+treeSet.toString());
         //NavigableSet interface implementacia
+        //vrati element mensi ako parameter
         System.out.println("lower treeSet:"+treeSet.lower(3));
+        //vrati element mensi rovny ako parameter
         System.out.println("floor treeSet:"+treeSet.floor(3));
+        //vrati element vacsi ako parameter
         System.out.println("higher treeSet:"+treeSet.higher(2));
+        //vrati element vacxi rovny ako parameter
         System.out.println("ceiling treeSet:"+treeSet.ceiling(2));
 
         System.out.println("first treeSet:"+treeSet.first());
         System.out.println("last treeSet:"+treeSet.last());
 
+        //vrati a vymaze prvy element z kolekcie
         System.out.println("pollFirst treeSet:"+treeSet.pollFirst());
         System.out.println("treeSet after pollFirst:"+treeSet.toString());
+        //vrati a vymaze posledny element z kolekcie
         System.out.println("pollLast treeSet:"+treeSet.pollLast());
         System.out.println("treeSet after pollLast:"+treeSet.toString());
 
@@ -78,12 +84,13 @@ public class Sety {
 
         //defaultne spravanie asc zoradenia mozem ovplivnit konstruktorom ktory ma vstup. param.
         //Comparator(funkcne interface), ktory je v nasom pripade anonymnou(triedou) implementaciou interface
-        TreeSet treeSetDesc = new TreeSet(new Comparator() {
+        Comparator comp = new Comparator() {
             @Override
             public int compare(Object o, Object t1) {
                 return ((Integer)t1).compareTo((Integer)o) ;
             }
-        });
+        };
+        TreeSet treeSetDesc = new TreeSet(comp);
         treeSetDesc.add(new Integer(1));
         treeSetDesc.add(new Integer(2));
         treeSetDesc.add(new Integer(3));

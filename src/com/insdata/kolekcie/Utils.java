@@ -24,7 +24,9 @@ public class Utils {
             }
         };
 
-//        arrayList.sort(arrayList, );
+        //je mozne sortovat aj bez Comparator interface
+        //ale v tom pripade musi Item trieda impolementovat Compare interface
+//        Collections.sort(arrayList);
         Collections.sort(arrayList, comparator);
         System.out.println("sorted arraylist:"+arrayList);
 
