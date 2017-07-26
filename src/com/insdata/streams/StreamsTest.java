@@ -1,8 +1,7 @@
 package com.insdata.streams;
 
-import com.insdata.strings.bufferAndBuilder.StringBuilders;
-
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -81,18 +80,18 @@ public class StreamsTest {
         //min a max funkcie pozaduju ako vstupny param. comparator
         // - pre nekonecny stream visi
         Comparator<String> stringComparator = (a,b)->a.compareTo(b);
-        System.out.println("streamOfAnimals min prvok:"+ streamOfAnimals.min(stringComparator));
+        System.out.println("streamOfAnimals min prvok:"+/*returns Optional*/ streamOfAnimals.min(stringComparator));
         streamOfAnimals = listOfAnnimals.stream();
-        System.out.println("streamOfAnimals max prvok:"+ streamOfAnimals.max(stringComparator));
+        System.out.println("streamOfAnimals max prvok:"+/*returns Optional*/ streamOfAnimals.max(stringComparator));
 
         /*-------------------------------------findAny(),findFirst()---------------------------------------------------*/
         //funguje aj s infinite stremom
         streamOfAnimals = listOfAnnimals.stream();
-        System.out.println("streamOfAnimals findAny prvok:"+ streamOfAnimals.findAny());
+        System.out.println("streamOfAnimals findAny prvok:"+/*returns Optional*/ streamOfAnimals.findAny());
 
         //funguje aj s infinite stremom
         streamOfAnimals = listOfAnnimals.stream();
-        System.out.println("streamOfAnimals findFirst prvok:"+ streamOfAnimals.findFirst());
+        System.out.println("streamOfAnimals findFirst prvok:"+/*returns Optional*/ streamOfAnimals.findFirst());
 
         //xxxMatch funkcie pozaduju ako vstupny param. Predicate ktory ma jeden param typu String vracia true/false
         Predicate<String> predicate = s -> s.startsWith("do");
@@ -116,7 +115,7 @@ public class StreamsTest {
 
         /*-------------------------------------reduce()----------------------------------------------------------------*/
         streamOfAnimals = listOfAnnimals.stream();
-        System.out.println(streamOfAnimals.reduce((a,b)->a+b));
+        System.out.println(/*returns Optional*/streamOfAnimals.reduce((a,b)->a+b));
 
         streamOfAnimals = listOfAnnimals.stream();
         System.out.println(streamOfAnimals.reduce((a,b)->a+b));
@@ -201,5 +200,52 @@ public class StreamsTest {
         //peek - vystupom je obsah streamu, sluzi na debug ucely, nijako neovplyvnuje vysledok
         streamOfAnimals = listOfAnnimals.stream();
         System.out.println(streamOfAnimals.peek(s->System.out.print(s+",")).filter(s->s.startsWith("d")).count());
+
+        /*------------------------------------------------zozbieravanie vysledkov(Collectors)--------------------------*/
+        //Basic collectors
+        //collectors predavame ako parameter do funkcie collect
+        Supplier<Stream<String>> animalsSupplier = ()->Stream.of("bear", "donkey", "monkey", "mouse");
+        Stream<String> animalsStream = animalsSupplier.get();
+        System.out.println("Average length of animal strings:"+animalsStream.collect(Collectors.averagingInt(String::length)));
+
+        //mozeme pracovat stream sposobom a nakonci vysledok zase dat do podoby pred java8 teda Stream na List
+        System.out.println("Filtered animal array list:"+ animalsSupplier.get().filter((s)->s.startsWith("m")).collect(Collectors.toList()));
+
+        //collecting do map
+        Map<Integer, String> animalsMap = animalsSupplier.get().collect(Collectors.toMap(s-> Math.abs(s.hashCode()), Function.identity()/*s->s*/));
+        System.out.println("animal Map:"+animalsMap);
+        //ak mame mapu s rovnakym klucom musime povedat collectoru co s tym ma robit
+        //toto skonci s chybou duplicate key
+//        animalsMap = animalsSupplier.get().collect(Collectors.toMap(s-> s.length(), Function.identity()/*s->s*/));
+        //treti parameter nam urcuje co sa ma robit ak pride ku kolizii hodnot asociovanymi pod jednym klucom
+        animalsMap = animalsSupplier.get().collect(Collectors.toMap(s-> s.length(), Function.identity()/*s->s*/,(u, u2) -> "->"+u+","+u2));
+        System.out.println("animal Map s rovnakym klucom:"+animalsMap);
+        //stvrty parameter urcuje aky typ sa ma vratit
+        animalsMap = animalsSupplier.get().collect(Collectors.toMap(s-> s.length(), Function.identity()/*s->s*/,(u, u2) -> "->"+u+","+u2, TreeMap::new));
+        System.out.println("animal TreeMap s rovnakym klucom:"+animalsMap);
+
+        //------------------------------------------------zgrupovanie---------------------------------------------------
+        Map<Integer, List<String>> zgrupnutaMapa = animalsSupplier.get().collect(Collectors.groupingBy(String::length));
+        //ked chcem vysledok v mape do setu
+        Map<Integer, Set<String>> zgrupnutaMapaDoSetu = animalsSupplier.get().collect(Collectors.groupingBy(String::length, Collectors.toSet()));
+        //ked chcem zmenit aj mapu
+        TreeMap<Integer, Set<String>> zgrupnutaTreeMapaDoSetu = animalsSupplier.get().collect(Collectors.groupingBy(String::length, TreeMap::new, Collectors.toSet()));
+        System.out.println("zgrupnutaMapa:"+zgrupnutaMapa);
+        //urcenie poctu clenov na zaklade pravidla
+        Map<Integer, Long> countingMembers = animalsSupplier.get().collect(Collectors.groupingBy(String::length,Collectors.counting()));
+        //mapping collector
+        Map<Integer, Optional<Character>> mapaZgrupnutaAZoradenaPodlaZaciatPismena = animalsSupplier.get().collect(Collectors.groupingBy(
+                 String::length,
+                 Collectors.mapping(
+                         s->s.charAt(0),
+                         Collectors.minBy(Comparator.naturalOrder()))));
+
+        //partitioning - je rozdelenie hodnot streamu do mapy ktora ma vzdy dva kluce true/false na zaklade nejakeho pravidla
+        Map<Boolean, List<String>> particiaZvierat = animalsSupplier.get().collect(Collectors.partitioningBy(s->s.length()<=5));
+        System.out.println("particiaZvierat:"+particiaZvierat);
+
+
+
+
     }
 }
