@@ -2,6 +2,9 @@ package com.insdata.kolekcie;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by key on 18.2.2017.
@@ -45,5 +48,22 @@ public class Queues {
             System.out.print(priorityQueue1.poll()+" ");
         }
         System.out.println();
+
+        BlockingQueue<String> blockingQueue = new LinkedBlockingQueue();
+        blockingQueue.offer("jedna");
+        blockingQueue.offer("dva");
+        try {
+            //v case ked je queue v stave cakania moze byt preruseny a potom vyhodi interrupted exception
+            blockingQueue.offer("tri", 100, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            //takisto moze vyhodit interrupted exception v stave cakania na citanie(poll) z queue
+            blockingQueue.poll(100, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

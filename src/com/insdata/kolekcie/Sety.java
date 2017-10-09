@@ -2,6 +2,8 @@ package com.insdata.kolekcie;
 
 import java.time.DayOfWeek;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -113,5 +115,27 @@ public class Sety {
         System.out.println("Vypis enumSet range:"+EnumSet.range(DayOfWeek.MONDAY, DayOfWeek.FRIDAY).toString());
         System.out.println("Vypis enumSet:"+EnumSet.allOf(DayOfWeek.class).toString());
         System.out.println("Vypis enumSet:"+EnumSet.of(DayOfWeek.SATURDAY,DayOfWeek.SUNDAY).toString());
+
+        //-------------------ConcurrentSkipListSet----------------------------
+        //je konkarentny naprotivok sortovaneho TreeSet
+        NavigableSet concurrentNavigableSet = new ConcurrentSkipListSet();
+
+        //-------------------ConcurrentSkipListMap---------------------------------------
+        //je konkarentna verzia sortovaneho naprotivejsku TreeMap
+        SortedMap<Integer, String> concCisla = new ConcurrentSkipListMap<>();
+
+        //--------------------------------------------Concurrency API -------------------------------------
+        Set<Integer> synchronizedSet = Collections.synchronizedSet(treeSet);
+        //POZOR na rozdiel od ConcurrentHashMap tato ma synchronizovane len get a set
+        //pri iteracii je ju treba explicitne synchronizovat
+
+
+        //iterator nieje sinchronizovany preto treba pri iteracii synchronizovat
+        synchronized (synchronizedSet) {
+            for (Integer key : synchronizedSet) {
+                //!!!!!!!!!!!!! vyhodi concurrency exception na rozdiel od ConcurrentHashMap
+                synchronizedSet.remove(key);
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.insdata.kolekcie;
 import java.time.DayOfWeek;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Created by key on 18.2.2017.
@@ -106,5 +107,39 @@ public class Mapy {
 
         //concurentne mapy
         //------------------ConcurrentHashMap---------
+        Map<Integer, String> cisla = new HashMap<>();
+        Map<Integer, String> concurrentCisla = new ConcurrentHashMap<>();
+
+        cisla.put(1, "jedna"); cisla.put(2, "dva"); cisla.put(3, "tri"); cisla.put(4, "styri");
+        concurrentCisla.put(1, "jedna"); concurrentCisla.put(2, "dva"); concurrentCisla.put(3, "tri"); concurrentCisla.put(4, "styri");
+
+        //predideme nou concurrencymodification exception
+        //read/write pristup je synchronizovany
+        for(Integer cislo : concurrentCisla.keySet()){
+            concurrentCisla.remove(cislo);
+        }
+
+        //!!!! vyhadzuje concurrency exception
+//        for(Integer cislo : cisla.keySet()){
+//            cisla.remove(cislo);
+//        }
+
+        //-------------------ConcurrentSkipListMap---------------------------------------
+        //je konkarentna verzia sortovaneho naprotivejsku TreeMap
+        SortedMap<Integer, String> concCisla = new ConcurrentSkipListMap<>();
+
+        //--------------------------------------------Concurrency API -------------------------------------
+        Map<Integer, String> synchronizedMap = Collections.synchronizedMap(cisla);
+        //POZOR na rozdiel od ConcurrentHashMap tato ma synchronizovane len get a set
+        //pri iteracii je ju treba explicitne synchronizovat
+
+
+        //iterator nieje sinchronizovany preto treba pri iteracii synchronizovat
+        synchronized (synchronizedMap) {
+            for (Integer key : synchronizedMap.keySet()) {
+                //!!!!!!!!!!!!! vyhodi concurrency exception na rozdiel od ConcurrentHashMap
+                synchronizedMap.remove(key);
+            }
+        }
     }
 }

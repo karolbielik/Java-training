@@ -121,5 +121,28 @@ public class Listy {
             System.out.print(descIt.next().toString()+",");
         }
 
+
+        //--------------------------------------------Concurrency API -------------------------------------
+        List<Integer> integers = Arrays.asList(1,2,3,4,5,6,7);
+        List<Integer> synchronizedList = Collections.synchronizedList(new LinkedList<>(integers));
+//        List<Integer> synchronizedList = Collections.synchronizedList(integers);
+        //pri iteracii je ju treba explicitne synchronizovat
+
+
+        //iterator nieje synchronizovany preto treba pri iteracii synchronizovat
+        synchronized (synchronizedList) {
+            for (Integer key : synchronizedList) {
+                //!!!!!!!!!!!!! remove() vyhodi UnsupportedException lebo nemoze sa removovat tymto sposobom
+//                synchronizedList.remove(key);
+            }
+            //iterovat treba pouzitim iteratora a to v synchronizovanom bloku
+            Iterator<Integer> iter = synchronizedList.iterator();
+            while(iter.hasNext()){
+                Integer item = iter.next();
+                //!!!! tiez vyhodi UnsupportedOperationException v pripade ze je List typu RandomAccess ako napr. ArrayList, ak pouzijem napr. LinkedList tak,
+                //remove bude fungovat.
+                iter.remove();
+            }
+        }
     }
 }
