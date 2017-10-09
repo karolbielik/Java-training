@@ -184,7 +184,7 @@ public class StreamsTest {
         streamOfAnimals = listOfAnnimals.stream();
         streamOfAnimals.map(String::length).forEach(System.out::println);
         /*---------------------------------------flatMap()-------------------------------------------------------------*/
-        //flatMap - zoberie kazdy prvok v streame vsetky elementy ktore stream obsahuje da do top-level urovne jedneho streamu
+        //flatMap - zoberie kazdy prvok v streame, vsetky elementy ktore stream obsahuje da do top-level urovne jedneho streamu
         //prazdne listy(s nula prvkami) ktore stream obsahuje do vysledku nezahrnie
         Stream<List<String>> animals = Stream.of(listOfAnnimals,listOfAnnimals,Arrays.asList("cat", "dove", "bird"));
         animals.flatMap(l->l.stream()).forEach(System.out::println);
@@ -234,18 +234,56 @@ public class StreamsTest {
         //urcenie poctu clenov na zaklade pravidla
         Map<Integer, Long> countingMembers = animalsSupplier.get().collect(Collectors.groupingBy(String::length,Collectors.counting()));
         //mapping collector
-        Map<Integer, Optional<Character>> mapaZgrupnutaAZoradenaPodlaZaciatPismena = animalsSupplier.get().collect(Collectors.groupingBy(
-                 String::length,
-                 Collectors.mapping(
-                         s->s.charAt(0),
-                         Collectors.minBy(Comparator.naturalOrder()))));
+//        Map<Integer, Optional<Character>> mapaZgrupnutaAZoradenaPodlaZaciatPismena = animalsSupplier.get().collect(Collectors.groupingBy(
+//                 String::length,
+//                 Collectors.mapping(
+//                         s->s.charAt(0),
+//                         Collectors.minBy(Comparator.naturalOrder()))));
 
         //partitioning - je rozdelenie hodnot streamu do mapy ktora ma vzdy dva kluce true/false na zaklade nejakeho pravidla
         Map<Boolean, List<String>> particiaZvierat = animalsSupplier.get().collect(Collectors.partitioningBy(s->s.length()<=5));
         System.out.println("particiaZvierat:"+particiaZvierat);
 
 
+        /*----------------------------------Paralelny pristup -------------------------------------------------------*/
+        Arrays.asList(1,2,3,4,5,6,7,8).stream().forEach(s -> System.out.print(s+" "));
+        //mozne pracovat s paralelnymi streamamy na Collection interface cez parallelStream metodu
+        Arrays.asList(1,2,3,4,5,6,7,8).parallelStream().forEach(s -> System.out.print(s+" "));
+        //alebo priamo na Stream pracovat z parallel streamom
+        Stream<Integer> intStream = Stream.of(1,2,3,4,5,6,7,8);
+        //kedze toto je spracovavane paralelne, tak vystup bude vzdy nepredvidatelny
+        intStream.parallel().forEach(s -> System.out.print(s+" "));
+        //s nejakou reziou navyse zarucime, ze vypis bude v poradi
+        intStream = Stream.of(1,2,3,4,5,6,7,8);
+        intStream.parallel().forEachOrdered(s -> System.out.print(s+" "));
 
+        intStream = Stream.of(1,2,3,4,5,6,7,8);
+        //vysledok je vzdy nepredpokladatelny, kedze sa jedna o paralelne spracovanie
+        System.out.println(intStream.parallel().findAny().get());
+        //findFirst, limit, skip pracuju pomalsie v paralelnom prostredi, pretoze paralelny task musi v tomto
+        //pripade koordinovat thready v synchronizovanym sposobom.
+        intStream = Stream.of(1,2,3,4,5,6,7,8);
+        //potom vrati vzdy konsistentny vysledok aj na seriovom aj paralelnom streame
+        System.out.println(intStream.skip(5).limit(2).findFirst());
 
+        intStream = Stream.of(1,2,3,4,5,6,7,8);
+        //unordered stream povie JVM, ze ak by mal uplatnit ordered-based operaciu, tak poradie moze ignorovat
+        //napr. skip(5) nepreskoci prvych 5 prvkov, ale 5 nejakych prvkov
+        //tymto sposobom sa moze zrychlit paralelne spracovanie
+        intStream.unordered().parallel().skip(3).forEach(s->System.out.print(s+" "));
+
+        //paralelne streamy v pripade reduce funkcie sa spravaju rovnako ako synchronne v pripade, ze
+        //dodrzime pravidla parametrov funkcie reduce
+        //prvy parameter identity combiner.apply(identity,u == u)
+        //druhy param. accumulator musi byt asociativny (a op b)opc == a op (b op c)
+        //treti param. combiner musi by asociativny combiner.apply(u,accumulator.apply(identity,t)) == accumulator.apply(u,t)
+        intStream = Stream.of(1,2,3,4,5,6,7,8);
+        intStream.parallel().reduce(0, (a,b)-> a+b);//bude vracat rovnaky vysledok ako synchronny stream
+
+        intStream = Stream.of(1,2,3,4,5,6,7,8);
+        intStream.parallel().reduce(0, (a,b)-> a-b);//tu je problem lebo odcitanie nieje asociativny operator
+
+        intStream = Stream.of(1,2,3,4,5,6,7,8);
+        intStream.parallel().reduce(1, (a,b)-> a+b);//tu je takisto problem lebo sme nedodrzali pravidlo pre prvy parameter
     }
 }
