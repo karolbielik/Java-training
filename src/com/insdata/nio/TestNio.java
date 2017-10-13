@@ -1,10 +1,16 @@
 package com.insdata.nio;
 
 import java.io.*;
-import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.*;
 
 /**
  * Created by karol.bielik on 18.9.2017.
+ *
+ * InputStream(abstract) <= (FileInputStream(low-level), FilterInputStream, ObjectInputStream) <= BufferedInputStream(extends FilterInputStream)
+ * Reader(abstract) <= (BufferedReader, InputStreamReader) <= FileReader(extends InputStreamReader a je low-level)
+ * OutputStream(abstract) <= (FileOutputStream low-level, FilterOutputStream, ObjectOutputStream) <= BufferedOutputStream (extends FilterOutputStream, PrintStream extends FilterOutputStream)
+ * Writer(abstract) <= (BufferedWriter, OutputStreamWriter, PrintWriter) <= FileWriter (extends OutputStreamWriter a je low-level)
  */
 public class TestNio {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -62,18 +68,24 @@ public class TestNio {
         //----------------------ObjectInputStream, ObjectOutputStream
         //mozem zapisat aky kolvek java objekt na subor v urcitom poradi a v tom isto m ho spat nacitat
         String serializedPath =      filePath+"serialized.serializujma.tst";
+        //kvoli performance pouzivame BufferedOutputStream wrapper
         ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(serializedPath)));
-        SerializujMa serializujMa = new TestNio.SerializujMa("serializacny test", 1L,2);
+        SerializujMa serializujMa = new TestNio.SerializujMa("serializacny test", 1L,2, new AjMnaSerializuj("Díki kámo za serializáciu"), "skús ma zaserializovať");
         System.out.println("serializujMa pred ulozenim do suboru:"+serializujMa.toString());
         oos.writeUTF("zaciatok serializacie");
         oos.writeObject(serializujMa);  //zaserializuje objekt tak ako je v pamati do bajtov
         oos.writeUTF("koniec serializacie");
         oos.flush();
         oos.close();
+        SerializujMa.mnaNeserializuj="resetuj";//vypise sa tato hodnota, lebo to bola posledna nasetovana
+        //transientne a staticke hodnoty sa inicializuju JVM defaultnymi hodnotami, pri deserializacii inicializacie
+        // tychto napr. v konstruktore, statickom alebo instancnom init bloku su ignorovane.
         ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(serializedPath)));
         System.out.println("nacitany serializovany objekt");
         System.out.println(ois.readUTF());
         System.out.println(((SerializujMa)ois.readObject()).toString());
+        //ak som zaserializoval viac objektov zasebou toho isteho typu, tak mozem pouzit nasledovne
+//        try{while(true){ois.readObject();}}catch (EOFException eofex){}
         System.out.println(ois.readUTF());
         ois.close();
 
@@ -98,7 +110,7 @@ public class TestNio {
 //        BufferedReader, BufferedWriter => cita/zapisuje data z existujuceho Reader/Writer tak ze ich
 //        bufferuje(nacita naraz viac), tym optimalizuje na performance
 //        InputStreamReader, OutputStreamWriter => cita/zapisuje data z/do InputStream
-//        PrintWriter => zapisuje formatevanu reprezentaciu java objektov do textoveho output streamu
+//        PrintWriter => zapisuje formatovanu reprezentaciu java objektov do textoveho output streamu
 
         //---------------------------------FileWriter, FileReader
         //najpouzivanejsie triedy pre pre zapisovanie a citanie textovych dat
@@ -143,7 +155,51 @@ public class TestNio {
         bfWr1.close();
         
         //---------------------------------InputStreamReader, OutputStreamWriter
+        //sluzi ako premostenie medzi streamami a znakovymi streamami, cita bajty a dekoduje ich do znakov pouzitim
+        //specifikovanej charakterovej sady
+        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(filePath+"streamReader.txt"), Charset.forName("windows-1250"));
+        String lubozvucne = "ľúbozvučné pičoviny:ľščťžýáíéäúňüäö";
+        osw.write(lubozvucne, 0, lubozvucne.length());
+        osw.flush();
+        osw.close();
+
+        InputStreamReader isr = new InputStreamReader(new FileInputStream(filePath+"streamReader.txt"), Charset.forName("windows-1250"));
+        System.out.print("Encoding:"+isr.getEncoding());
+        int data;
+        List<Character> text = new ArrayList<>();
+        while((data = isr.read()) != -1){
+            text.add((char)data);
+        }
+        isr.close();
+
         //---------------------------------PrintWriter
+        PrintWriter pw = new PrintWriter(new FileOutputStream(filePath+".printWriter.txt"));
+        pw.print("test rôznych typov");
+        pw.println();
+        pw.println(1);
+        pw.print(true);
+        pw.println();
+        pw.println("formátovaný text americký");
+        /*formatovacie konverzie => https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html#syntax
+        - lave zarovnanie argumentu
+        + pridaj znak + al. - pre argument
+        0 preznakuj argument s nulami
+        , pouzi lokal separator
+        ( uzatvor negativne cisla to zatvoriek
+        b boolean
+        c char
+        d integer
+        f floating pint
+        s string
+        t datum => nemoze byt len osamote
+        * */
+        pw.format(Locale.US, "This is american style date %1$tm %1$tB %1$tY and number %2$f .%n", new Date(), 3.14);
+        pw.format(new Locale("sk"/*ISO 639 alpha-2 al. alpha-3*/,"SK"/*ISO 3166 alpha-2*/), "Toto je sloenský dátum %1$tm %1$tB %1$tY a číslo %2$f .%n", new Date(), 3.14);
+        pw.format("Táto deska má %1$5.2f metra a váži %2$d kilov.%n", 1.2, 100);
+        pw.format("Dneska je %1$tm.%1te.%1$tY, a počasie vyzerá byť %2$s, ale nedal by som zato ani %3$.2f.%n", new Date(), "slnečno", 2.5);
+        pw.flush();
+        pw.close();
+
 
 
     }
@@ -185,14 +241,24 @@ public class TestNio {
 
 
     private static class SerializujMa implements Serializable{
+        private/*moze byt akykolvek accessor*/ static final long serialVersionUID = 1L;//verzia serializacie, kvoli deserializacii
+                                                                                        //aby java vedela, ci je objekt kompatibilny
+                                                                                        //Ak by verzia nesedela, tak vyhodi
+                                                                                        //InvalidClassException
         String serializujString;
         Long serializujLong;
         Integer serializujInteger;
+        /*transient =>ak dany objekt chceme vynat zo serializacie, potom sa ani neulozi do suboru*/
+        AjMnaSerializuj ajMnaSerializuj;
+        static String mnaNeserializuj = "mnaNeser";
 
-        public SerializujMa(String serializujString, Long serializujLong, Integer serializujInteger) {
+        public SerializujMa(String serializujString, Long serializujLong, Integer serializujInteger, AjMnaSerializuj ajMnaSerializuj, String... mnaNeserializuj) {
             this.serializujString = serializujString;
             this.serializujLong = serializujLong;
             this.serializujInteger = serializujInteger;
+            this.ajMnaSerializuj = ajMnaSerializuj;
+            if(mnaNeserializuj.length>0)
+            this.mnaNeserializuj = mnaNeserializuj[0];
         }
 
         public String getSerializujString() {
@@ -219,12 +285,46 @@ public class TestNio {
             this.serializujInteger = serializujInteger;
         }
 
+        public AjMnaSerializuj getAjMnaSerializuj() {
+            return ajMnaSerializuj;
+        }
+
+        public void setAjMnaSerializuj(AjMnaSerializuj ajMnaSerializuj) {
+            this.ajMnaSerializuj = ajMnaSerializuj;
+        }
+
         @Override
         public String toString() {
             return "SerializujMa{" +
                     "serializujString='" + serializujString + '\'' +
                     ", serializujLong=" + serializujLong +
                     ", serializujInteger=" + serializujInteger +
+                    ", ajMnaSerializuj=" + ajMnaSerializuj +
+                    ", mnaNeserializuj='" + mnaNeserializuj + '\'' +
+                    '}';
+        }
+    }
+
+    private static class AjMnaSerializuj implements Serializable/*pozor musi byt Serializable lebo je vnoreny, inak vyhodi
+                                                                  NotSerializableException*/{
+        public String hoak;
+
+        public AjMnaSerializuj(String hoak) {
+            this.hoak = hoak;
+        }
+
+        public String getHoak() {
+            return hoak;
+        }
+
+        public void setHoak(String hoak) {
+            this.hoak = hoak;
+        }
+
+        @Override
+        public String toString() {
+            return "AjMnaSerializuj{" +
+                    "hoak='" + hoak + '\'' +
                     '}';
         }
     }
