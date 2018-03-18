@@ -4,7 +4,16 @@ import java.util.Objects;
 
 public class DefaultMethod {
     public static void main(String[] args) {
-        Objects.requireNonNull(null);
+
+        TestDefault td = new TestDefault() {
+            @Override
+            public String mojeMenoJe() {
+                return "Martinko Klingac";
+            }
+        };
+
+        System.out.println("Moje meno je:"+td.mojeMenoJe());
+        System.out.println("Meno zeme je:"+td.menoZeme());
 
     }
 }
