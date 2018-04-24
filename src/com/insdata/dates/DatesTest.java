@@ -38,6 +38,7 @@ public class DatesTest {
         LocalDate customDatePonovom = LocalDate.of(2017, Month.JULY, 22);
         System.out.println("customDate ponovom:"+customDatePonovom);
 
+        /*---------------------ZoneId, ZonedDateTime------------------------------------------*/
         ZonedDateTime sysZdt = ZonedDateTime.now();
         System.out.println("System time:"+sysZdt);
         ZoneId zoneIdOfJerusalem = ZoneId.of("Asia/Jerusalem");
@@ -58,6 +59,7 @@ public class DatesTest {
         //na zaklade pravidiel(kt. sa mozu menit podla lubovole(vlady) daneho regionu) pre dany geo region, prepocita podla nejakeho absolutneho casu offset od Greenwich
         System.out.println("Jerusalem geografical region offset:"+ZoneId.of("Asia/Jerusalem").getRules().getOffset(Instant.now()));
 
+        //----------------------------------------------------------------------------------------------
         //manipulacia s datumom
         LocalDateTime manipulovanyDatum = LocalDateTime.now();
         System.out.println("pred manipulovanim pridavanie ponovom:"+manipulovanyDatum);
@@ -89,8 +91,9 @@ public class DatesTest {
         System.out.println("before period added:"+localDateTime);
         System.out.println("after period added:"+localDateTime.plus(period));
 
+        /*-------------------------------nastavi den v mesiaci na 2-heho------------------------------------------*/
         LocalDate ld1 = LocalDate.now();
-        System.out.println(ld1.withDayOfMonth(2));//nastavi den v mesiaci na 2-heho
+        System.out.println(ld1.withDayOfMonth(2));
 
         /*--------------------------------------------------duration-------------------------------------------------*/
         LocalTime lt1 = LocalTime.of(5, 30);
@@ -126,6 +129,8 @@ public class DatesTest {
         dateTime = dateTime.plusHours(1);
         System.out.println(dateTime);
         //to iste plati pre posun casu vzad 6.nov.2016
+        dateTime = dateTime.minusHours(2);
+        System.out.println(dateTime);
 
 
     }
