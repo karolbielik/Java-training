@@ -40,10 +40,23 @@ public class DatesTest {
 
         ZonedDateTime sysZdt = ZonedDateTime.now();
         System.out.println("System time:"+sysZdt);
-        ZonedDateTime zdt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Asia/Jerusalem"));
+        ZoneId zoneIdOfJerusalem = ZoneId.of("Asia/Jerusalem");
+        ZonedDateTime zdt = ZonedDateTime.of(LocalDateTime.now(), zoneIdOfJerusalem);
         System.out.println("Jerusalem time:"+zdt);
+        //zoznam moznych region-based ZoneIds:
 //      ZoneId.getAvailableZoneIds().forEach(System.out::println);
-//        ZoneId.getAvailableZoneIds().stream().filter(s->s.toLowerCase().startsWith("eur")).sorted().forEach(System.out::println);
+//      ZoneId.getAvailableZoneIds().stream().filter(s->s.toLowerCase().startsWith("eur")).sorted().forEach(System.out::println);
+
+        //ZoneId(ofset of casovej zony Greenwich napr. +02:00(ZoneOffset)) identifikuje pravidla(Rules) konverzie Instant(je bod v case ratany od 1.1.1970)
+        // na LocalDateTime(je date-time format year-month-day-hour-minute-second bez info o casovych zonach)
+        //ZoneId ma dva tvary: a)UTC/Greenwich podobu(offset-based), b)geograficky region(region-based) na kt. sa vztahuju pravidla pre
+        //vypocet offset-u od Greenwich
+        System.out.println("Jerusalem time offset from Greenwich:"+ZoneId.of("UTC+03:00").getId());
+        System.out.println("Jerusalem time offset from Greenwich normalized:"+ZoneId.of("UTC+03:00").normalized().getId());
+
+        System.out.println("Jerusalem geografical region:"+ZoneId.of("Asia/Jerusalem"));
+        //na zaklade pravidiel(kt. sa mozu menit podla lubovole(vlady) daneho regionu) pre dany geo region, prepocita podla nejakeho absolutneho casu offset od Greenwich
+        System.out.println("Jerusalem geografical region offset:"+ZoneId.of("Asia/Jerusalem").getRules().getOffset(Instant.now()));
 
         //manipulacia s datumom
         LocalDateTime manipulovanyDatum = LocalDateTime.now();
@@ -113,5 +126,7 @@ public class DatesTest {
         dateTime = dateTime.plusHours(1);
         System.out.println(dateTime);
         //to iste plati pre posun casu vzad 6.nov.2016
+
+
     }
 }
