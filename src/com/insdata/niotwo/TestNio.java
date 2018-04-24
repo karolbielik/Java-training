@@ -1,22 +1,25 @@
 package com.insdata.niotwo;
 
 import com.insdata.primitives.Chars;
+import com.sun.prism.shader.FillEllipse_Color_AlphaTest_Loader;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
-/**
+/**f
  * Created by karol.bielik on 12.9.2017.
  */
 public class TestNio {
 
     public static void main(String[] args) {
+        //starym sposobom IO
         String directoryPath = System.getProperty("user.dir")
                 +File.separator
                 +"resources"
@@ -172,22 +175,45 @@ public class TestNio {
         }
         //----------------zakladne operacie nad subormi --------------------------
         //---------------------------vytvorenie suboru-----------------------------------
-        //-------------------------------newBufferedWriter()---------------------------------
+        //-------------------------------Files.createFile()---------------------------------
         Path novySubor = Paths.get("resources","nio2", "vytvoreny.subor.txt");
         //je treba sa uistit ze dana cesta existuje ak nie tak musime vytvorit adresar
         try {
             Files.createDirectories(novySubor.getParent());
         } catch (IOException e) {e.printStackTrace();}
 
-        try (BufferedWriter bw = getBufferedWriter(novySubor)){
+
+        try {
+            //vytvori novy prazdny subor v pripade ze neexistuje
+            //ak existuje vyhodi FileAlreadyExistsException
+            Files.createFile(novySubor);
+
+        }catch (FileAlreadyExistsException faex){
+            faex.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        //vytvorim BufferedWriter pomocou factory a appendujem do existujuceho suboru
+        try(BufferedWriter bw = Files.newBufferedWriter(novySubor, StandardCharsets.UTF_8, StandardOpenOption.APPEND)) {
             bw.write("test : ľščťžýáíéäň");
-            bw.newLine();
+            bw.flush();
+            //bw.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //-------------------------------newBufferedWriter()---------------------------------
+        //vytvorenie suboru pomocou newBufferedWriter aj s obsahom
+//        try (BufferedWriter bw = getBufferedWriter(novySubor)){
+//            bw.write("test : ľščťžýáíéäň");
+//            bw.newLine();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         //-------------------------citanie zo suboru------------------------------------------------
         //-------------------------------newBufferedReader()---------------------------------
-        try(BufferedReader br = Files.newBufferedReader(novySubor,Charset.forName("UTF-8"))){
+        try(BufferedReader br = Files.newBufferedReader(novySubor,StandardCharsets.UTF_8)){
             String line;
             System.out.println("---------------Vypis ulozeneho suboru-------------------");
             while ((line = br.readLine())!=null){
