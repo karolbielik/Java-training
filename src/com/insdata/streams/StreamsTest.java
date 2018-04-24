@@ -210,6 +210,7 @@ public class StreamsTest {
 
         //mozeme pracovat stream sposobom a nakonci vysledok zase dat do podoby pred java8 teda Stream na List
         System.out.println("Filtered animal array list:"+ animalsSupplier.get().filter((s)->s.startsWith("m")).collect(Collectors.toList()));
+//        Collectors.
 
         //collecting do map
         Map<Integer, String> animalsMap = animalsSupplier.get().collect(Collectors.toMap(s-> Math.abs(s.hashCode()), Function.identity()/*s->s*/));
