@@ -28,4 +28,8 @@ public class Lampa {
         svieti = false;
         System.out.println("lampa svieti:"+svieti);
     }
+
+    public boolean isSvieti() {
+        return svieti;
+    }
 }

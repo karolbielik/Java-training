@@ -9,6 +9,7 @@ public class DiscoGula extends Lampa{/*musi byt public class aj konstruktor lebo
 
 //    public int x = 2;
     boolean tociSa;//implicitne je false
+    boolean svieti;
 
     DiscoGula(){
         //super();

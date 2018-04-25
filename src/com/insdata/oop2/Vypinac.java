@@ -39,5 +39,15 @@ public class Vypinac {
 //        System.out.println(lampa1.x);
 //        System.out.println(lampa2.x);
 
+        //prekryvanie atributov triedy
+        DiscoGula dg = new DiscoGula();
+        dg.svieti = false;
+        Lampa dgLampa = dg;
+        //nastavi svieti na Lampa na true
+        dgLampa.zapniLampu();
+        System.out.println("DiscoGula.svieti:"+dg.svieti);
+        System.out.print("DiscoGula->Lampa svieti:"+dgLampa.isSvieti());
+
+
     }
 }
