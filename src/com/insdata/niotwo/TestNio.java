@@ -391,6 +391,23 @@ public class TestNio {
             e.printStackTrace();
         }
 
+        //PosixFileAttributeView => pre linux
+        //iba pre Windows
+        AclFileAttributeView aclFav = Files.getFileAttributeView(
+                novySubor,
+                AclFileAttributeView.class//,
+        );
+        if(aclFav==null){
+            throw new UnsupportedOperationException();
+        }
+
+        try {
+            //vypis ACL(Windows) opravneni nad tymto suborom, pre uzivatelov
+            aclFav.getAcl().stream().forEach(System.out::println);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         FileOwnerAttributeView foav = Files.getFileAttributeView(
                 novySubor,
                 FileOwnerAttributeView.class//,
@@ -406,6 +423,8 @@ public class TestNio {
             up = path.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName("INSDATA\\karol.bielik");
 
             System.out.println("Principal suboru:"+foav.getOwner());
+            //dany principal(user) musi mat fullcontrol nad suborom, aby vedel menit owner
+            //inac throws AccessDeniedException
             foav.setOwner(up);
 
         } catch (IOException e) {
