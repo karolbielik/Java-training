@@ -55,7 +55,7 @@ public class TestThreads {
                 }
                 return "po pici to dobehlo";
             });
-            //ocakavame vysledok do  0,1 sekundy cim dostaneme TimeOutException
+            //ocakavame vysledok do  0,01 sekundy cim dostaneme TimeOutException
             System.out.println(res.get(100, TimeUnit.MILLISECONDS));
         }catch (TimeoutException toex){
             System.out.println(toex.toString());
@@ -73,7 +73,6 @@ public class TestThreads {
 
         service = Executors.newSingleThreadExecutor();
         try {
-
             //spusti sa synchronne, tasky sa spustia asynchronne
             //caka na vsetky tasky zakial sa vykonaju a vrati vysledok
             List<Future<String>> futures = service.invokeAll(tasks);
@@ -81,7 +80,7 @@ public class TestThreads {
                 System.out.println(future.get());
             }
 
-            //ak prvy task nejaky skoncil tak ostatne terminuje a vrati vysledok
+            //ak skoncil nejaky z taskov ako prvy, tak ostatne sa terminuju a vrati vysledok
             String resAny = service.invokeAny(tasks);
             System.out.println("Vysledok resAny"+resAny);
         }
@@ -90,13 +89,13 @@ public class TestThreads {
         }
 
 
-        service = Executors.newSingleThreadExecutor();
+//        service = Executors.newSingleThreadExecutor();
         //mozem pouzit aj multy-threaded executor
-//        service = Executors.newCachedThreadPool();
+        service = Executors.newCachedThreadPool();
         //alebo kde parameter predstavuje velkost pool teda threadov vytvorenych
 //        service = Executors.newFixedThreadPool(10);
         //velkost threadov urcujeme podla mnozstva CPU a podla povahy tasku
-        //ak mam task ktory zatazuje procesor viac, tak vytvaram menej threadov a ak mam task ktory je viac zavisli
+        //ak mam task ktory zatazuje procesor viac, tak vytvaram menej threadov a ak mam task ktory je viac zavisly
         //na externych resoursoch(DB, internet)tak mozem pouzit viac threadov
         System.out.println("Pocet dostupnych procesorov:"+ Runtime.getRuntime().availableProcessors());
         try {
