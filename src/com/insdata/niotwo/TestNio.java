@@ -6,6 +6,7 @@ import com.sun.prism.shader.FillEllipse_Color_AlphaTest_Loader;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -357,11 +358,60 @@ public class TestNio {
                 novySubor,
                 UserDefinedFileAttributeView.class//,
         );
+        try {
+            ByteBuffer bb = Charset.defaultCharset().encode("myValue");
+            //vytvori novy file attribute
+            udfav.write("myAttribute",  bb);
+            udfav.write("myAttribute2", bb);
+
+            //nastavi possition na 0 a je tym pripraveny na citanie
+            bb.rewind();
+            //precita hodnotu menovaneho attributu
+            udfav.read("myAttribute", bb);
+            //nastavi limit na current possition a potom possition na 0
+            //v tomto pripade mi staci pouzit rewind cim tiez pripravim buffer na citanie
+//            bb.rewind();
+            bb.flip();
+
+            ByteBuffer readBb = ByteBuffer.allocate(udfav.size("myAttribute"));
+            udfav.read("myAttribute", readBb);
+            readBb.flip();
+
+            System.out.println("Original ByteBuffer used => myAttribute value read from file property:"+Charset.defaultCharset().decode(bb).toString());
+            System.out.println("New ByteBuffer used => myAttribute value read from file property:"+Charset.defaultCharset().decode(readBb).toString());
+
+            udfav.list().stream().forEach(s->System.out.println("File atribut vytvoreny uzivatelom:"+s));
+
+            //vymaze custom file attribute
+            udfav.delete("myAttribute");
+            udfav.list().stream().forEach(s->System.out.println("File atribut vytvoreny uzivatelom, po vymazani atributu myAttribute:"+s));
+            //vyhodi NoSuchFileException
+            udfav.read("myAttribute", readBb);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         FileOwnerAttributeView foav = Files.getFileAttributeView(
                 novySubor,
                 FileOwnerAttributeView.class//,
         );
+        if(foav == null){
+            throw new UnsupportedOperationException();
+        }
+        //dalsi sposob ako nastavit owner na subore/adresary
+        UserPrincipal up = null;
+        try {
+            System.out.println("Meno attribute view(to iste ako v UserDefinedFileAttributeView):"+foav.name());
+
+            up = path.getFileSystem().getUserPrincipalLookupService().lookupPrincipalByName("INSDATA\\karol.bielik");
+
+            System.out.println("Principal suboru:"+foav.getOwner());
+            foav.setOwner(up);
+
+        } catch (IOException e) {
+//            e.getCause().printStackTrace();
+            e.printStackTrace();
+        }
     }
 
     private static BufferedWriter getBufferedWriter(Path novySubor) throws IOException {
