@@ -5,5 +5,5 @@ package com.insdata.funkcne.interfeis;
  */
 @FunctionalInterface
 public interface OknoKontrolovatelne {
-    boolean skontroluj();
+    boolean mozemSaOtvorit();
 }

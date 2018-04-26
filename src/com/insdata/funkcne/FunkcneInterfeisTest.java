@@ -3,7 +3,6 @@ package com.insdata.funkcne;
 import com.insdata.funkcne.interfeis.OknoKontrolovatelne;
 //import org.apache.commons.lang3.StringUtils;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -26,25 +25,34 @@ UnaryOperator<T>        1               (T) T           apply
 BinaryOperator<T>       2               (T, T) T        apply
 * */
 
-public class FunkcneInterfiesTest {
+public class FunkcneInterfeisTest {
 
     public static void main(String[] args) {
         Okno okno = new Okno();
         boolean vonkuFucka = true;
 
+        //parameter je funkcne interface OknoKontrolovatelne
+        //mozem priamo zadat lambda vyraz
         okno.zavriOkno(()->vonkuFucka);
-        OknoKontrolovatelne skusCiMozemOtvoritOkno = ()->!vonkuFucka;
-        okno.otvorOkno(skusCiMozemOtvoritOkno);
+        //alebo mozem zadat funkciu ktora vracia implementovane funkcne interface
+        okno.otvorOkno((new KontrolorOkna()).mozemOtvoritKontrolovatelneOkno(vonkuFucka));
 
-        //parameter je Supplier ktory je definovany v java 8
         KontrolorOkna kontrolorOkna = new KontrolorOkna();
-        okno.zavriOknoStandart(()-> vonkuFucka);
-        Supplier<Boolean> skusCiMamZavrietOkno = ()->vonkuFucka;
+        //lambda vyraz mozem priradit funkcnemu interface, ktore zodpoveda signature metody
+        Supplier<Boolean> skusCiMamOtvoritOkno = ()->kontrolorOkna.mozemOtvoritOkno(vonkuFucka);
+        //parameter je Supplier funkcne interface ktore je definovany v java 8
+        okno.otvorOknoStandart(skusCiMamOtvoritOkno);
 
-        Predicate<Boolean> kontrolaZavretiaOkna = t->KontrolorOkna.musimZavrietOkno(t);
+        //implementuje funkcne interface lambda vyrazom
+        Predicate<Boolean> kontrolaZavretiaOkna = (t) -> KontrolorOkna.mozemZavrietOkno(t);
+        //na danej implementacii zavolam implementovanu metodu
         okno.zavriOknoStandardTest(kontrolaZavretiaOkna.test(vonkuFucka));
 
-        kontrolaZavretiaOkna = KontrolorOkna::musimZavrietOkno;
+        //implementujem funkcne interface referenciou na metodu,
+        // ktorej signatura v parametrovej casti metody zodpoveda signature metody
+        //vo funkcnom interface
+        kontrolaZavretiaOkna = KontrolorOkna::mozemZavrietOkno;
+        //tymto sposobom predam parameter do implementacie interface
         okno.zavriOknoStandardTest(kontrolaZavretiaOkna.test(vonkuFucka));
 
     }
@@ -56,7 +64,11 @@ class KontrolorOkna{
         return !vonkuFuka;
     }
 
-    public static Boolean musimZavrietOkno(Boolean vonkuFuka){
+    public static Boolean mozemZavrietOkno(Boolean vonkuFuka){
         return vonkuFuka;
+    }
+
+    public OknoKontrolovatelne mozemOtvoritKontrolovatelneOkno(Boolean vonkuFucka){
+        return ()-> !vonkuFucka;
     }
 }

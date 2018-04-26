@@ -16,22 +16,22 @@ public class Okno {
     }
 
     boolean zavriOkno(OknoKontrolovatelne oknoKontrolovatelne){
-        if(oknoKontrolovatelne.skontroluj()){
+        if(oknoKontrolovatelne.mozemSaOtvorit()){
             zavrete = true;
             System.out.println("Zatvaram okno");
         }else{
             System.out.println("Okno nezatvorim");
         }
-        return oknoKontrolovatelne.skontroluj();
+        return oknoKontrolovatelne.mozemSaOtvorit();
     }
 
     boolean otvorOkno(OknoKontrolovatelne oknoKontrolovatelne){
-        if(oknoKontrolovatelne.skontroluj()){
+        if(oknoKontrolovatelne.mozemSaOtvorit()){
             System.out.println("Otvaram okno");
         }else{
             System.out.println("Okno neotvorim");
         }
-        return oknoKontrolovatelne.skontroluj();
+        return oknoKontrolovatelne.mozemSaOtvorit();
     }
 
     boolean zavriOknoStandart(Supplier<Boolean> oknoKontrolovatelne){
@@ -40,6 +40,16 @@ public class Okno {
             System.out.println("Zatvaram okno standardne");
         }else{
             System.out.println("Okno nezatvorim standardne");
+        }
+        return oknoKontrolovatelne.get();
+    }
+
+    boolean otvorOknoStandart(Supplier<Boolean> oknoKontrolovatelne){
+        if(oknoKontrolovatelne.get()){
+            zavrete = false;
+            System.out.println("Otvaram okno standardne");
+        }else{
+            System.out.println("Okno neotvorim standardne");
         }
         return oknoKontrolovatelne.get();
     }

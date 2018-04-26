@@ -1,6 +1,7 @@
 package com.insdata.funkcne.strategy;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
 /**
  * Created by karol.bielik on 21.6.2017.
