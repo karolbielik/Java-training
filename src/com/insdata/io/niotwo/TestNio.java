@@ -1,7 +1,4 @@
-package com.insdata.niotwo;
-
-import com.insdata.primitives.Chars;
-import com.sun.prism.shader.FillEllipse_Color_AlphaTest_Loader;
+package com.insdata.io.niotwo;
 
 import java.io.*;
 import java.net.URI;
@@ -11,7 +8,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
-import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 /**f
@@ -32,7 +28,7 @@ public class TestNio {
 
 //        //nove NIO.2
         Path path = file.toPath();
-//        //je moznost aj z NIO2 na NIO
+//        //je moznost aj z NIO2 na IO
         file = path.toFile();
         path.toUri();
 
@@ -52,9 +48,20 @@ public class TestNio {
 //        Paths.get("/", "projekt", "resources", "nio2");
 
         //pre adresovanie resourcu cez uri (file://, http://, https://)
-//        Paths.get("file:///c:/miesto/na/sieti");
-        //alebo
-//        try {Paths.get(new URI("file:///c:/miesto/na/sieti"));} catch (URISyntaxException e) {}
+//        Paths.get("file:///z:/miesto/na/sieti"); //=>z je namapovany zdielany folder
+/*
+        Path shareFolder;
+        try {
+            shareFolder = Paths.get(new URI("file:///z:/tst/tst.txt"));
+            Files.createFile(shareFolder);
+        }
+        catch (URISyntaxException e) {
+            System.out.println(e.getMessage());
+        }
+        catch (IOException ioex){
+            System.out.println(ioex.getMessage());
+        }
+*/
 
         Path path2 = Paths.get("resources","nio2");
         try {
