@@ -52,7 +52,8 @@ public class TestNio {
 /*
         Path shareFolder;
         try {
-            shareFolder = Paths.get(new URI("file:///z:/tst/tst.txt"));
+//            shareFolder = Paths.get(new URI("file:///z:/tst/tst.txt")); //z je namapovany zdielany folder \\fs\cbn
+            shareFolder = Paths.get(new URI("file:////fs/cbn/tst/tst.txt")); //priamo pristupujem na shared folder, nie cez mapovanie vo windows
             Files.createFile(shareFolder);
         }
         catch (URISyntaxException e) {
