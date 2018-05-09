@@ -163,6 +163,7 @@ public class IOTest {
         //---------------------------------InputStreamReader, OutputStreamWriter
         //sluzi ako premostenie medzi byte streamami a znakovymi streamami, cita bajty a dekoduje ich do znakov pouzitim
         //specifikovanej charakterovej sady
+        //POZOR Charset je uz funkcionalita pridana do NIO od Java SE 4+
         OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(filePath+"streamReader.txt"), Charset.forName("windows-1250"));
         String lubozvucne = "ľúbozvučné ľahkovážnosti:ľščťžýáíéäúňüäö";
         osw.write(lubozvucne, 0, lubozvucne.length());
