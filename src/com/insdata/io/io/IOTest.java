@@ -20,12 +20,32 @@ import java.util.*;
 public class IOTest {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         //File - sluzi na pracu s hlavickami suboru/adresara
-        String filePath = System.getProperty("user.dir")
-                +File.separator
-                +"resources"
-                +File.separator
-                +"testFileStream.txt";
-        File file = new File(filePath);
+        String resourcesPath =
+                //System.getProperty("user.dir")
+                //+File.separator+
+                "resources"
+                +File.separator;
+        File file = new File(resourcesPath+"testFileStream.txt");
+        //pre lepsie odlisenie Path a Absolutnej cesty pouzi relativnu cestu pre filePath lokalneho clena
+        System.out.println("Path suboru "+file.getName()+" je:"+file.getPath());
+        //absolutna cesta napr. ak resourcesPath = ../resources/ => C:/adresar1/../resources/
+        System.out.println("Absolute Path suboru "+file.getName()+" je:"+file.getAbsolutePath());
+        //je absolutna cesta, tak ako je to v adresarovej strukture systemu => C:/adresar1/adresar2/resources/
+        System.out.println("Canonical Path suboru "+file.getName()+" je:"+file.getCanonicalPath());
+        System.out.println("Parent suboru "+file.getName()+" je:"+file.getParent());
+
+        //vracia long dlzku suboru, alebo 0L ked subor neexistuje
+        System.out.println("dlzka suboru testFileStream.txt:"+file.length());
+        System.out.println("Total space particie je:"+file.getTotalSpace());
+
+        if(file.isDirectory()){
+            System.out.println("Zoznam suborov a adresarov v adresary:"+file.getName());
+            System.out.println(file.list());
+            System.out.println("Zoznam suborov v adresary:"+file.getName());
+            System.out.println(file.listFiles());
+
+        }
+
         //---------------------implementujuce interface InputStream a OutputStream--------------------------------------
         //File(Input/Output)Stream je trieda nizkeho pristupu k byte datam suboru, low-level
         //Buffered(Input/Output)Stream treba pouzivat ako efektivny pristup k suborom, kedy su data ulozene na disku sekvencne, high-level
@@ -34,14 +54,13 @@ public class IOTest {
 
         //-------------------FileInputStream, FileOutputStream
         //zapisuje/cita data ako bajty
-        copyFileWithFileStream(file, new File(filePath+".copy"));
+        copyFileWithFileStream(file, new File(resourcesPath+".copy"));
 
         //---------------------------------- BufferedInputStream, BufferedOutputStream
         //cita/zapisuje data po skupinach bajtov cim zvysuje performance
-        copyFileWithBufferedStream(file, new File(filePath+".copy"));
+        copyFileWithBufferedStream(file, new File(resourcesPath+".copy"));
 
-        // markSupported(), mark(int), reset()
-
+        //--------------- markSupported(), mark(int), reset()
         InputStream is = new BufferedInputStream( new FileInputStream(file));
         System.out.println("Velkost suboru:"+is.available());
         //mark sluzi na to aby sa oznacilo miesto v streame a potom sa vedelo pokracovat od toho miesta
@@ -72,8 +91,8 @@ public class IOTest {
         System.out.print((char) is.read());
 
         //----------------------ObjectInputStream, ObjectOutputStream
-        //mozem zapisat aky kolvek java objekt na subor v urcitom poradi a v tom isto m ho spat nacitat
-        String serializedPath =      filePath+"serialized.serializujma.tst";
+        //mozem zapisat aky kolvek java objekt na subor v urcitom poradi a v tom istom ho spat nacitat
+        String serializedPath =      resourcesPath+"serialized.serializujma.tst";
         //kvoli performance pouzivame BufferedOutputStream wrapper
         ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(serializedPath)));
         SerializujMa serializujMa = new IOTest.SerializujMa("serializacny test", 1L,2, new AjMnaSerializuj("Díki kámo za serializáciu"), "skús ma zaserializovať");
@@ -97,7 +116,7 @@ public class IOTest {
 
         //----------------------------------------PrintStream
         //mozem vypisovat nim aj na systemovy vystup, ktory je tiez Stream, alebo do suboru
-        PrintStream ps = new PrintStream(System.out/*new FileOutputStream(serializedPath)*/);
+        PrintStream ps = new PrintStream(/*System.out*/new FileOutputStream(resourcesPath+"printStreamFormated.txt"));
         ps.println("zaciatok print stream serializacie");
         ps.println(serializujMa); //zaserializuje objekt ako citatelny string//defaultne enkodovanie je pouzite
         ps.println("koniec print stream serializacie");
@@ -120,7 +139,7 @@ public class IOTest {
 
         //---------------------------------FileWriter, FileReader
         //najpouzivanejsie triedy pre pre zapisovanie a citanie textovych dat
-        String fileReaderPath = filePath+"filereader.txt";
+        String fileReaderPath = resourcesPath+"filereader.txt";
         FileWriter fw = new FileWriter(new File(fileReaderPath));
         FileReader fr = new FileReader(new File(fileReaderPath));
         FileWriter fwcopy = new FileWriter(new File(fileReaderPath+".copy"));
@@ -139,7 +158,7 @@ public class IOTest {
         //---------------------------------BufferedReader, BufferedWriter
         //buffrovany pristup, mozne ho parovat s FileWriter,FileReader
         //taky isty priklad ako pre FileReader/Writer s pouzitim wrapper triedy
-        String bufferedReaderPath = filePath+"bufferedreader.txt";
+        String bufferedReaderPath = resourcesPath+"bufferedreader.txt";
         BufferedWriter bfWr = new BufferedWriter(new FileWriter(bufferedReaderPath));
         bfWr.write("Tak toto by som necakal, ze sa to tak rýchlo skopííííruje.");
         bfWr.newLine();
@@ -149,14 +168,16 @@ public class IOTest {
         BufferedReader bfRe = new BufferedReader(new FileReader(bufferedReaderPath));
         BufferedWriter bfWr1 = new BufferedWriter(new FileWriter(bufferedReaderPath+".copy"));
         String readData = null;
-//        while ((readData = bfRe.readLine())!=null){
-//            bfWr1.write(readData);
-//        }
+        while ((readData = bfRe.readLine())!=null){
+            bfWr1.write(readData);
+        }
         //alebo cez lambdu
+        /*
         bfRe.lines().forEach(line->{
             try{bfWr1.write(line);
             }catch (IOException ioex){}
         });
+        */
         bfWr1.flush();
         bfWr1.close();
 
@@ -164,23 +185,25 @@ public class IOTest {
         //sluzi ako premostenie medzi byte streamami a znakovymi streamami, cita bajty a dekoduje ich do znakov pouzitim
         //specifikovanej charakterovej sady
         //POZOR Charset je uz funkcionalita pridana do NIO od Java SE 4+
-        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(filePath+"streamReader.txt"), Charset.forName("windows-1250"));
+        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(resourcesPath+"streamReader.txt"), Charset.forName("windows-1250"));
         String lubozvucne = "ľúbozvučné ľahkovážnosti:ľščťžýáíéäúňüäö";
         osw.write(lubozvucne, 0, lubozvucne.length());
         osw.flush();
         osw.close();
-
-        InputStreamReader isr = new InputStreamReader(new FileInputStream(filePath+"streamReader.txt"), Charset.forName("windows-1250"));
-        System.out.print("Encoding:"+isr.getEncoding());
+        //tuna je pouzity bez Charset, teda pred verziou 1.4
+        InputStreamReader isr = new InputStreamReader(new FileInputStream(resourcesPath+"streamReader.txt"),"windows-1250");
+        System.out.println("Encoding:"+isr.getEncoding()!=null?isr.getEncoding():"null");
         int data;
         List<Character> text = new ArrayList<>();
         while((data = isr.read()) != -1){
             text.add((char)data);
         }
         isr.close();
+        System.out.println("Vypis InputStreamReader nacitaneho zo suboru streamReader:");
+        System.out.println(text);
 
         //---------------------------------PrintWriter
-        PrintWriter pw = new PrintWriter(new FileOutputStream(filePath+".printWriter.txt"));
+        PrintWriter pw = new PrintWriter(new FileOutputStream(resourcesPath+".printWriter.txt"));
         pw.print("test rôznych typov");
         pw.println();
         pw.println(1);
@@ -246,12 +269,10 @@ public class IOTest {
         }
     }
 
-
     private static class SerializujMa implements Serializable{
         private/*moze byt akykolvek accessor*/ static final long serialVersionUID = 1L;//verzia serializacie, kvoli deserializacii
         //aby java vedela, ci je objekt kompatibilny
-        //Ak by verzia nesedela, tak vyhodi
-        //InvalidClassException
+        //Ak by verzia nesedela, tak vyhodi InvalidClassException
         String serializujString;
         Long serializujLong;
         Integer serializujInteger;
