@@ -54,13 +54,14 @@ public class IOTest {
 
         //-------------------FileInputStream, FileOutputStream
         //zapisuje/cita data ako bajty
-        copyFileWithFileStream(file, new File(resourcesPath+".copy"));
+        copyFileWithFileStream(file, new File(resourcesPath+file.getName()+".copy.txt"));
 
         //---------------------------------- BufferedInputStream, BufferedOutputStream
         //cita/zapisuje data po skupinach bajtov cim zvysuje performance
-        copyFileWithBufferedStream(file, new File(resourcesPath+".copy"));
+        copyFileWithBufferedStream(file, new File(resourcesPath+file.getName()+".copy.txt"));
 
-        //--------------- markSupported(), mark(int), reset()
+        //BufferedInput/OutputStream podporuje:
+        // -------------------markSupported(), mark(int), reset()
         InputStream is = new BufferedInputStream( new FileInputStream(file));
         System.out.println("Velkost suboru:"+is.available());
         //mark sluzi na to aby sa oznacilo miesto v streame a potom sa vedelo pokracovat od toho miesta
@@ -72,13 +73,14 @@ public class IOTest {
             System.out.print((char) is.read());
 
             is.reset();
+
+            System.out.println();
+            System.out.println("Po resete:");
+            System.out.print((char) is.read());
+            System.out.print((char) is.read());
+            System.out.print((char) is.read());
+            System.out.print((char) is.read());
         }
-        System.out.println();
-        System.out.println("Po resete:");
-        System.out.print((char) is.read());
-        System.out.print((char) is.read());
-        System.out.print((char) is.read());
-        System.out.print((char) is.read());
 
         //skip
         is = new BufferedInputStream( new FileInputStream(file));
@@ -95,7 +97,7 @@ public class IOTest {
         String serializedPath =      resourcesPath+"serialized.serializujma.tst";
         //kvoli performance pouzivame BufferedOutputStream wrapper
         ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(serializedPath)));
-        SerializujMa serializujMa = new IOTest.SerializujMa("serializacny test", 1L,2, new AjMnaSerializuj("Díki kámo za serializáciu"), "skús ma zaserializovať");
+        SerializujMa serializujMa = new IOTest.SerializujMa("serializacny test", 1L,2, new AjMnaSerializuj("Díki kámo za serializáciu"), 55, "skús ma zaserializovať");
         System.out.println("serializujMa pred ulozenim do suboru:"+serializujMa.toString());
         oos.writeUTF("zaciatok serializacie");
         oos.writeObject(serializujMa);  //zaserializuje objekt tak ako je v pamati do bajtov
@@ -103,8 +105,8 @@ public class IOTest {
         oos.flush();
         oos.close();
         SerializujMa.mnaNeserializuj="resetuj";//vypise sa tato hodnota, lebo to bola posledna nasetovana
-        //transientne a staticke hodnoty sa inicializuju JVM defaultnymi hodnotami, pri deserializacii inicializacie
-        // tychto napr. v konstruktore, statickom alebo instancnom init bloku su ignorovane.
+        //transientne a staticke hodnoty sa neserializuju a pri deserializacii sa inicializuju JVM defaultnymi hodnotami,
+        // inicializacie tychto napr. v konstruktore, instancnom init bloku su ignorovane, staticky blok nieje ignorovany.
         ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(serializedPath)));
         System.out.println("nacitany serializovany objekt");
         System.out.println(ois.readUTF());
@@ -118,7 +120,7 @@ public class IOTest {
         //mozem vypisovat nim aj na systemovy vystup, ktory je tiez Stream, alebo do suboru
         PrintStream ps = new PrintStream(/*System.out*/new FileOutputStream(resourcesPath+"printStreamFormated.txt"));
         ps.println("zaciatok print stream serializacie");
-        ps.println(serializujMa); //zaserializuje objekt ako citatelny string//defaultne enkodovanie je pouzite
+//        ps.println(serializujMa); //zaserializuje objekt ako citatelny string//defaultne enkodovanie je pouzite
         ps.println("koniec print stream serializacie");
         ps.flush();
         //nevyhadzuje IOException ako ine outputStream ale nastavi flag, ktory mozeme kontrolovat
@@ -142,7 +144,7 @@ public class IOTest {
         String fileReaderPath = resourcesPath+"filereader.txt";
         FileWriter fw = new FileWriter(new File(fileReaderPath));
         FileReader fr = new FileReader(new File(fileReaderPath));
-        FileWriter fwcopy = new FileWriter(new File(fileReaderPath+".copy"));
+        FileWriter fwcopy = new FileWriter(new File(fileReaderPath+".copy.txt"));
         fw.write("Tak toto by som necakal, ze sa to skopííííruje.");
         fw.flush();
         fw.close();
@@ -166,7 +168,7 @@ public class IOTest {
         bfWr.flush();
         bfWr.close();
         BufferedReader bfRe = new BufferedReader(new FileReader(bufferedReaderPath));
-        BufferedWriter bfWr1 = new BufferedWriter(new FileWriter(bufferedReaderPath+".copy"));
+        BufferedWriter bfWr1 = new BufferedWriter(new FileWriter(bufferedReaderPath+".copy.txt"));
         String readData = null;
         while ((readData = bfRe.readLine())!=null){
             bfWr1.write(readData);
@@ -183,7 +185,9 @@ public class IOTest {
 
         //---------------------------------InputStreamReader, OutputStreamWriter
         //sluzi ako premostenie medzi byte streamami a znakovymi streamami, cita bajty a dekoduje ich do znakov pouzitim
-        //specifikovanej charakterovej sady
+        //specifikovanej charakterovej sady,
+        // inac sa pouzivat encoding =>System.getProperty("file.encoding");
+
         //POZOR Charset je uz funkcionalita pridana do NIO od Java SE 4+
         OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(resourcesPath+"streamReader.txt"), Charset.forName("windows-1250"));
         String lubozvucne = "ľúbozvučné ľahkovážnosti:ľščťžýáíéäúňüäö";
@@ -238,6 +242,7 @@ public class IOTest {
         FileInputStream bis = new FileInputStream(source);
         FileOutputStream bos = new FileOutputStream(destination);
 
+        //hoci je to int pracuje tu vzdy len s 1 byteom
         int c;
         try {
             while ((c = bis.read()) != -1) {
@@ -276,15 +281,25 @@ public class IOTest {
         String serializujString;
         Long serializujLong;
         Integer serializujInteger;
-        /*transient =>ak dany objekt chceme vynat zo serializacie, potom sa ani neulozi do suboru*/
+        //transient /*=>ak dany objekt chceme vynat zo serializacie, potom sa ani neulozi do suboru*/
         AjMnaSerializuj ajMnaSerializuj;
-        static String mnaNeserializuj = "mnaNeser";
+        static String mnaNeserializuj ;//= "mnaNeser";
+        transient Integer initZBloku;
 
-        public SerializujMa(String serializujString, Long serializujLong, Integer serializujInteger, AjMnaSerializuj ajMnaSerializuj, String... mnaNeserializuj) {
+        static{
+            mnaNeserializuj = "mnaNeser";
+        }
+
+        {
+            initZBloku = 77;
+        }
+
+        public SerializujMa(String serializujString, Long serializujLong, Integer serializujInteger, AjMnaSerializuj ajMnaSerializuj, Integer initZbloku, String... mnaNeserializuj) {
             this.serializujString = serializujString;
             this.serializujLong = serializujLong;
             this.serializujInteger = serializujInteger;
             this.ajMnaSerializuj = ajMnaSerializuj;
+            this.initZBloku = initZbloku;
             if(mnaNeserializuj.length>0)
                 this.mnaNeserializuj = mnaNeserializuj[0];
         }
@@ -328,7 +343,7 @@ public class IOTest {
                     ", serializujLong=" + serializujLong +
                     ", serializujInteger=" + serializujInteger +
                     ", ajMnaSerializuj=" + ajMnaSerializuj +
-                    ", mnaNeserializuj='" + mnaNeserializuj + '\'' +
+                    ", initZBloku=" + initZBloku +
                     '}';
         }
     }
