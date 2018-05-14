@@ -31,10 +31,10 @@ public class TestNio {
             +File.separator;
 
     public static void main(String[] args) {
-        String fileName = "testFile.txt";
+        String fileName = "mappedFile.txt";
 
-        readBlocking(fileName);
-        readNonBlocking(fileName);
+        readIOSposob(fileName);
+        readNIOSposob(fileName);
 
         //mapovanie casti suboru na buffer
         mappedBufferExample();
@@ -42,9 +42,15 @@ public class TestNio {
     }
 
     //NIO presunulo operacie ako naplnanie buffera na uroven operacneho systemu, co zrychlilo pristup k suborom
-    private static void readNonBlocking(String fileName) {
-        try (RandomAccessFile raf = new RandomAccessFile(directoryPath + fileName, "r")) {
+    private static void readNIOSposob(String fileName) {
+        try (RandomAccessFile raf = new RandomAccessFile(directoryPath + fileName, "rw")) {
             //v java 4 bolo tomuto pridana metoda getChannel
+            /*
+            Channel oproti stream:
+            - cita aj zapisuje zaroven, do streamu je mozne iba zapisovat, alebo iba citat
+            - je mozne do channel cita/zapisovat asynchronne
+            - channel vzdy zapisuje do alebo cita z buffer-a
+             */
             FileChannel channel = raf.getChannel();
 //            ByteBuffer buffer = ByteBuffer.allocate(536870912);
             //v pripade, ze pracujem s velkymi subormi tak alokujem konstantnu velkost aby som nesportreboval pamat
@@ -56,7 +62,7 @@ public class TestNio {
             long startTime = System.currentTimeMillis();
 
             //------------------Buffer terminologia--------------------------------
-            //Kapacita - je fixna velkost bufra. Ak je kapacita bufera naplneny,
+            //Kapacita - je fixna velkost bufra. Ak je kapacita bufera naplnena,
             // je potrebne ho vycistit(clear)
             //Pozicia - je zavisla na read/write mode. Je to pozicia z ktorej sa cita/zapisuje.
             //Po kazdom buffer.get()/citanie alebo put()/zapis sa pozicia posunie o jednu.
@@ -64,7 +70,16 @@ public class TestNio {
             //Limit - je limit, ktory urcuje kolko dat mozeme z bufra cita.
             // Je zavisly na read/write mode. V pripade zapisu sa Limit=Kapacita
             //Ak flip(nem) zo zapisovanieho modu do citacieho, limit je nastaveny na write
-            //poziciu write modu. Teda mozeme citat, maximalne tolko dat kolko bolo zapisanych.
+            //poziciu write modu.
+
+            /*
+            Write Mode
+            --------------------|-------------|
+                            pozicia         limit,kapacita
+            Read Mode
+            |-------------------|-------------|
+            pozicia         limit           kapacita
+            * */
 
             //------------------operacie nad Buffer--------------------------------
             //------------------rewind-----------------------
@@ -94,7 +109,7 @@ public class TestNio {
 //                }
 //                System.out.println(Charset.defaultCharset().decode(ByteBuffer.wrap(buffer.array())));
                 //vycistim buffer kvoli nacitaniu dalsich dat
-                buffer.clear();
+//                buffer.clear();
             }
             long endTime = (new Date()).getTime();
             System.out.println("Duration time non-blocking:"+(endTime-startTime));
@@ -106,7 +121,7 @@ public class TestNio {
         }
     }
 
-    private static void readBlocking(String fileName) {
+    private static void readIOSposob(String fileName) {
         try (RandomAccessFile raf = new RandomAccessFile(directoryPath + fileName, "r")) {
 //            byte[] dataRead = new byte[536870912];
             byte[] dataRead = new byte[1024];
@@ -133,16 +148,22 @@ public class TestNio {
     public static void mappedBufferExample()
     {
         int length = 0xC00000; // 12 MB
-        MappedByteBuffer out = null;
+        MappedByteBuffer mappedBuffer = null;
         try {
             FileChannel channel = new RandomAccessFile(directoryPath +"mappedFile.txt", "rw")
                     .getChannel();
-            out = channel.map(FileChannel.MapMode.READ_WRITE, 0, length);
+            mappedBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, length);
 
             for (int i = 0; i < length; i++)
             {
-                //prepise prvych 12 MB suboru na pismeno x
-                out.put((byte) 'x');
+                System.out.print((char)mappedBuffer.get(i));
+                if(mappedBuffer.get(i)=='a') {
+                    //prepise prvych 12 MB suboru na pismeno x vsade tam kde je a
+                    mappedBuffer.put((byte) 'x');
+                }
+                else{
+                    mappedBuffer.position(mappedBuffer.position()+1);
+                }
             }
             channel.close();
         } catch (IOException e) {

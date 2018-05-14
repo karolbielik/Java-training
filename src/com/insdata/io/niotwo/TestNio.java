@@ -1,5 +1,7 @@
 package com.insdata.io.niotwo;
 
+import sun.nio.fs.WindowsFileSystemProvider;
+
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -8,46 +10,53 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
+import java.util.EnumSet;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-/**f
+/**
  * Created by karol.bielik on 12.9.2017.
+ *
+ * Jave SE 7+ NIO.2
  */
 public class TestNio {
 
     public static void main(String[] args) {
-        //starym sposobom IO
         String directoryPath = System.getProperty("user.dir")
                 +File.separator
                 +"resources"
                 +File.separator
                 +"nio2"
                 +File.separator;
-        //legacy kod
+        //legacy kod(I/O)
         File file = new File(directoryPath + "test.txt");
 
-//        //nove NIO.2
+        //------------------------------------Path----------------------------------------------
+        //zo stareho File na nove NIO.2 Path
         Path path = file.toPath();
-//        //je moznost aj z NIO2 na IO
+        //je moznost aj z NIO2 na IO
         file = path.toFile();
-        path.toUri();
 
-        //pod Linuxom absolutna cesta /home/xy
-        //pod windowsom absolutna cesta c:\\home\xy
-        //relativna cesta home\xy
-
+        //Najjednoduhsi sposob ako vytvorit Path je cez Paths factory metodu get()
         //vytvorenim cez get a pouzitim relativnej cesty sa pouzije cesta akoby sme napisali
-        //Pahts.get(System.getProperty("user.dir")+File.separator+"resources"+File.separator+"nio2");
+        //Paths.get(System.getProperty("user.dir")+File.separator+"resources"+File.separator+"nio2");
         Path path1 = Paths.get("resources","nio2");
-        //da sa napisat aj zlozitejsie
+        //da sa napisat aj pomocou FileSystems => takto to implementuje Paths.get metoda
         path1 = FileSystems.getDefault().getPath("resources", "nio2");
+
+        /*
+        pod Linuxom absolutna cesta /home/xy
+        pod windowsom absolutna cesta c:\\home\xy
+        relativna cesta home\xy, alebo ..\home\xy
+        */
+
         //absolutnu cestu by som rovnako vytvoril:
         //pod windows
-//        Paths.get("C:", "projekt", "resources", "nio2");
+        Paths.get("C:", "projekt", "resources", "nio2");
         //pod linux
-//        Paths.get("/", "projekt", "resources", "nio2");
+        Paths.get("/", "projekt", "resources", "nio2");
 
-        //pre adresovanie resourcu cez uri (file://, http://, https://)
+        //pre adresovanie resourcu cez uri (file://, http://, https://)=typ resource nasledovany absolutnou cestou
 //        Paths.get("file:///z:/miesto/na/sieti"); //=>z je namapovany zdielany folder
 /*
         Path shareFolder;
@@ -82,9 +91,13 @@ public class TestNio {
         //ATOMIC_MOVE:pri presune suboru, ak to file system nepodporuje tak vyhodi AtomicMoveNotSupportedException
                         // => ak je presun atomicky, tak proces monitorujuci presuvanie subor nikdy nespozoruje
                         // ciastocne nedokonceny, presunuty subor
-        //-------------------------------------------------------------------------
-        //---------------------Operacie nad Path objektom--------------------------
+        //--------------------------------------------------------------------------------------------------------------
+        //---------------------------------------------Operacie nad Path objektom---------------------------------------
         Path fileTest = Paths.get("resources","nio2","test.txt");
+        //---------------------getNameCount--------------------------------
+        //vrati pocet elementov cesty
+        //---------------------getName-------------------------------------
+        //vrati meno i-teho elementu v ceste
         for(int i = 0;i<fileTest.getNameCount();i++){
             //getName(int) vracia string ale java vola pri konverzii na string toString() na Path
             System.out.println(fileTest.getName(i));//getName je indexovana od 0 ,system root cesta nieje zahrnuta
@@ -113,7 +126,7 @@ public class TestNio {
         //sluzi na vytvorenie, resp. pouzitie nejakej casti existujuce cesty na vytvorenie danej podcesty v ramci inej cesty
         //prvy a druhy parameter nemozu byt tie iste cisla a max hodnota parametra moze byt max n, ak by bol n+1 tak vyhodi IllegalArgumentException
         //root nieje zahrnuty do indexu, cize v nasom pripade iindex=0 => jedna
-        Path path5 = Paths.get("/jedna/dva/tri/styri");
+        Path path5 = Paths.get("jedna/dva/tri/styri");
         System.out.println("path5 subpath:"+path5.subpath(0/*included*/, 3/*excluded*/));
 
         //----------------relativize(Path)----------------------------------------------
@@ -138,6 +151,12 @@ public class TestNio {
         System.out.println(path6.resolve(path7));
         //ak do parametru dame absolutnu cestu a this je ralativna, tak sa this ignoruje
         System.out.println(path6.resolve(path8));
+
+        /*
+        ./ => referencia k sucasnemu(tomuto) adresaru
+        ../ => referencia k rodicovy sucasneho(tohoto) adresara
+        */
+
         //--------------------------------normalize()------------------------------------------------
         Path path10 = Paths.get("C:\\cesta\\do\\..\\zeme\\nezeme");
         Path path11 = Paths.get("pekna\\rit");
@@ -145,7 +164,7 @@ public class TestNio {
         System.out.println(path12 = path10.resolve(path11));
         System.out.println(path12.normalize());
 
-        //-----------------------------------------java.nio.file.Files------------------------------------
+        //------------------------------------------------java.nio.file.Files-------------------------------------------
         //---------------------------------------------exists()-------------------------------------------
         System.out.println("Subor existuje:"+Files.exists(path10));
         //---------------------------------------------isSameFile()-------------------------------------------
@@ -153,11 +172,16 @@ public class TestNio {
             //ak subory/adresare(nasleduje aj symbolic links) existuju tak zisti ci su dva objekty equal()
             //neporovnava obsah suborov, ak su dva identicke subory(obsah a atributy) kazdy na inej lokacii
             //tak to vyhodnoti ako ine subory.
-            System.out.println("Je to ten isty subor:"+Files.isSameFile(path10, Paths.get("C:\\cesta\\do\\zeme\\nezeme")));
+            Path projectFolder = Paths.get( System.getProperty("user.dir"));
+            Path file1 = Paths.get(projectFolder.toString(), "resources", "testFileStream.txt");
+            Path file2 = Paths.get("resources", "testFileStream.txt");
+            System.out.println("Je to ten isty subor:"+Files.isSameFile(file1, file2));
         } catch (NoSuchFileException e) {
             e.printStackTrace();
-        } catch (IOException ioex){}
-
+        } catch (IOException ioex){
+            ioex.printStackTrace();
+        }
+//TODO:pokracovat tu
         try {
             //drevo ak by bol sym link tak vrati true
 //            System.out.println(Files.isSameFile(Paths.get("/user/home/dubina"), Paths.get("/user/home/drevo")));
@@ -171,7 +195,7 @@ public class TestNio {
         }
 
         //-----------------------------EXAMPLES-----------------------------------
-        //zakladne operacie nad adresarmi
+        //--------------------------------------------------zakladne operacie nad adresarmi-----------------------------
         //--------------createDirectory(), createDirectories()------------------------------
         try {
 //            Files.createDirectory(Paths.get("C:\\rodic\\dieta"));//vyhodi kontrolovanu IOException, ked rodicovsky adresar neexistuje
@@ -182,7 +206,7 @@ public class TestNio {
         catch (IOException e) {
             e.printStackTrace();
         }
-        //----------------zakladne operacie nad subormi --------------------------
+        //--------------------------------------------zakladne operacie nad subormi ------------------------------------
         //---------------------------vytvorenie suboru-----------------------------------
         //-------------------------------Files.createFile()---------------------------------
         Path novySubor = Paths.get("resources","nio2", "vytvoreny.subor.txt");
@@ -244,7 +268,7 @@ public class TestNio {
         //----------------------------prekopirovanie suboru---------------------------------------
         //-----------------------------------copy()-------------------------------------------------
         Path kopirovanySubor = Paths.get(novySubor.getParent().toString()+"\\kopia.noveho.suboru.txt");
-        try {//TODO:este dokoncit ked vytvorim subor, tak jeho kopirovanie
+        try {
             //kopirovanie nefunguje rekurzivne(vnorene), prekopuruje len dany adresar(nie obsah) a subor s obsahom
             //Ak subor uz exituje tak vyhodi FileAlreadyExistsException
             Files.copy(novySubor, kopirovanySubor );
@@ -277,7 +301,7 @@ public class TestNio {
             e.printStackTrace();
         }
 
-        //----------------------------------Atributy suborov/adresarov------------------------------------
+        //-----------------------------------------Atributy suborov/adresarov-------------------------------------------
         //----------isDiretory(), isRegularFile(), isSymbolicLink()---------------------------------------
         System.out.println("subor/adresar:"+novySubor.getFileName()+":je adresar:"+Files.isDirectory(novySubor));
         System.out.println("subor/adresar:"+novySubor.getFileName()+":je subor:"+Files.isRegularFile(novySubor));
@@ -437,6 +461,62 @@ public class TestNio {
 
         } catch (IOException e) {
 //            e.getCause().printStackTrace();
+            e.printStackTrace();
+        }
+
+        //------------------------------------------------FileStore-----------------------------------------------------
+        //java.io.File funkcie vracajuce info o ulozisku prestahovane
+        // do noveho package java.nio.file.FileStore
+        try {
+            for(FileStore fs : FileSystems.getDefault().getFileStores()){
+                System.out.println("Total space:"+fs.getTotalSpace());
+                System.out.println("Usable space:"+fs.getUsableSpace());
+                System.out.println("Unallocated space:"+fs.getUnallocatedSpace());
+                System.out.println("FileSystem type:"+fs.type());
+                System.out.println("FileSystem name:"+fs.name());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //-------------------------------------------WatchService-------------------------------------------------------
+        try {
+            WatchService watchService = FileSystems.getDefault().newWatchService();
+            Paths.get( System.getProperty("user.dir"))
+                    .resolve("resources")
+                    .resolve("watcherFolder")
+                    .register(watchService,
+                    StandardWatchEventKinds.ENTRY_CREATE,
+                    StandardWatchEventKinds.ENTRY_DELETE,
+                    StandardWatchEventKinds.ENTRY_MODIFY);
+            //---------------------------poll--------------------------------------
+            //caka 5 sekunt na objavenie sa eventu
+            //vrati null ak ziaden event sa neobjavil
+            WatchKey eventOccured = watchService.poll(15, TimeUnit.SECONDS);
+            if(eventOccured != null){
+                for(WatchEvent event : eventOccured.pollEvents()){
+                    event.context().toString();
+                }
+            }
+
+            //---------------------------take--------------------------------------
+            //caka zakial sa neobjavi nejaky z registrovanych eventov
+            WatchKey eventTaken;
+            while((eventTaken = watchService.take())!=null){
+                for(WatchEvent event : eventTaken.pollEvents()){
+                    System.out.print("EVENT:"+event.kind().name());
+                    System.out.print(" => ");
+                    System.out.print("context:"+event.context().toString());
+                    System.out.println();
+                }
+            //-------------------------------reset------------------------------
+            //reset je dolezite zavolat, lebo sa uz dalej nebudu pollovat registrovane
+            // eventy create, delete, modify
+                eventTaken.reset();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
