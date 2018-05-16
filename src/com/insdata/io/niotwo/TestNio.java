@@ -574,7 +574,9 @@ public class TestNio {
         try {
             //traversuje depth-first
             Files.walkFileTree(Paths.get("resources"), fileVisitor);
-            //traversuje len jednu uroven pod root, teda obsah resources adresara
+            //traversuje len jednu uroven pod root, teda obsah resources adresara, a zapina mechanizmus
+            //sledovania infinite loop pre pripad, ze sym link sposobil cyklicku referenciu, teda ukazuje
+            //na nejaky zo svojich parent elementov=> vyhodi sa FileSystemLoopException v postVisitDirectory
             //Files.walkFileTree(Paths.get("resources"), EnumSet.of(FileVisitOption.FOLLOW_LINKS), 1, fileVisitor);
         } catch (IOException e) {
             e.printStackTrace();
@@ -593,6 +595,7 @@ public class TestNio {
             */
             Stream<Path> traverseDepthFirst = Files.walk(Paths.get("resources"));
             //traversuje len jednu uroven pod root, teda obsah resources adresara
+            //plati to iste pre sym link ako pre walkFileTree hore.
             //Stream<Path> traverseDepthFirst = Files.walk(Paths.get("resources"),1/*, FileVisitOption.FOLLOW_LINKS*/);
             traverseDepthFirst
                     .filter(path13 -> path13.getFileName().toString().endsWith("txt"))
