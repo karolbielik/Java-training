@@ -36,8 +36,15 @@ public class TestNio {
         readIOSposob(fileName);
         readNIOSposob(fileName);
 
+        System.out.println("files processing finished");
+
         //mapovanie casti suboru na buffer
-        mappedBufferExample();
+//        mappedBufferExample();
+
+        //for loop pridana kvoli visualVM
+//        for(;;){
+//
+//        }
 
     }
 
