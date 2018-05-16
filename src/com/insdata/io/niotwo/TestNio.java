@@ -6,13 +6,16 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * Created by karol.bielik on 12.9.2017.
@@ -176,30 +179,45 @@ public class TestNio {
             Path file1 = Paths.get(projectFolder.toString(), "resources", "testFileStream.txt");
             Path file2 = Paths.get("resources", "testFileStream.txt");
             System.out.println("Je to ten isty subor:"+Files.isSameFile(file1, file2));
+
+            //bufferedreaderLink je hard link na bufferedreader tak vrati true
+            Path hardLink = Paths.get("resources/bufferedreaderLink.txt");
+            if(!Files.exists(hardLink)){
+                Files.createLink(
+                        Paths.get("resources/bufferedreaderLink.txt"),
+                        Paths.get("resources/bufferedreader.txt")
+                );
+            }
+            //DU - miesto hard linku vytvor kopiu suboru a potom porovnaj
+            System.out.println("bufferedreader is same file so symlink:"+Files.isSameFile(
+                    Paths.get( System.getProperty("user.dir"),"resources/bufferedreaderLink.txt"),
+                    Paths.get( System.getProperty("user.dir"),"resources/bufferedreader.txt")));
+
+            //vrati true, lebo v pozadi sa cesta normalizuje
+            System.out.println("bufferedreader is same file s parent directory:"+
+                    Files.isSameFile(
+                            Paths.get(System.getProperty("user.dir"),"resources/nio/../bufferedreader.txt"),
+                            Paths.get( System.getProperty("user.dir"),"resources/bufferedreader.txt")));
+
+            System.out.println("bufferedreader is same file s current directory:"+
+                    Files.isSameFile(
+                            Paths.get(System.getProperty("user.dir"),"resources/./bufferedreader.txt"),
+                            Paths.get( "resources/bufferedreader.txt")));
+
         } catch (NoSuchFileException e) {
             e.printStackTrace();
         } catch (IOException ioex){
-            ioex.printStackTrace();
-        }
-//TODO:pokracovat tu
-        try {
-            //drevo ak by bol sym link tak vrati true
-//            System.out.println(Files.isSameFile(Paths.get("/user/home/dubina"), Paths.get("/user/home/drevo")));
-
-            //vrati true, lebo v pozadi sa cesta normalizuje
-            System.out.println("/abs/cesta/:"+Files.isSameFile(Paths.get("/abs/cesta/../daleko"), Paths.get("/abs/cesta")));
-            System.out.println(Files.isSameFile(Paths.get("/leaves/./giraffe.exe"), Paths.get("/leaves/giraffe.exe")));
-            System.out.println(Files.isSameFile(Paths.get("/flamingo/tail.data"), Paths.get("/cardinal/tail.data")));
-        }catch (IOException ioex){
-            ioex.printStackTrace();
+//            ioex.printStackTrace();
+            ioex.getCause().printStackTrace();
         }
 
         //-----------------------------EXAMPLES-----------------------------------
         //--------------------------------------------------zakladne operacie nad adresarmi-----------------------------
         //--------------createDirectory(), createDirectories()------------------------------
+        Path rodicDietaDir=null;
         try {
 //            Files.createDirectory(Paths.get("C:\\rodic\\dieta"));//vyhodi kontrolovanu IOException, ked rodicovsky adresar neexistuje
-            Files.createDirectories(Paths.get("C:\\rodic\\dieta"));//vytvori neexistujece rodicovske adresare
+            rodicDietaDir = Files.createDirectories(Paths.get("resources\\rodic\\dieta"));//vytvori neexistujece rodicovske adresare
         } catch (NoSuchFileException nfe) {
             nfe.printStackTrace();
         }
@@ -209,62 +227,19 @@ public class TestNio {
         //--------------------------------------------zakladne operacie nad subormi ------------------------------------
         //---------------------------vytvorenie suboru-----------------------------------
         //-------------------------------Files.createFile()---------------------------------
-        Path novySubor = Paths.get("resources","nio2", "vytvoreny.subor.txt");
-        //je treba sa uistit ze dana cesta existuje ak nie tak musime vytvorit adresar
-        try {
-            Files.createDirectories(novySubor.getParent());
-        } catch (IOException e) {e.printStackTrace();}
-
+        Path novySubor = rodicDietaDir.resolve("vytvoreny.subor.txt");
 
         try {
             //vytvori novy prazdny subor v pripade ze neexistuje
             //ak existuje vyhodi FileAlreadyExistsException
             Files.createFile(novySubor);
-
         }catch (FileAlreadyExistsException faex){
             faex.printStackTrace();
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-        //vytvorim BufferedWriter pomocou factory a appendujem do existujuceho suboru
-        try(BufferedWriter bw = Files.newBufferedWriter(novySubor, StandardCharsets.UTF_8, StandardOpenOption.APPEND)) {
-            bw.write("test : ľščťžýáíéäň");
-            bw.flush();
-            //bw.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        //-------------------------------newBufferedWriter()---------------------------------
-        //vytvorenie suboru pomocou newBufferedWriter aj s obsahom
-//        try (BufferedWriter bw = getBufferedWriter(novySubor)){
-//            bw.write("test : ľščťžýáíéäň");
-//            bw.newLine();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        //-------------------------citanie zo suboru------------------------------------------------
-        //-------------------------------newBufferedReader()---------------------------------
-        try(BufferedReader br = Files.newBufferedReader(novySubor,StandardCharsets.UTF_8)){
-            String line;
-            System.out.println("---------------Vypis ulozeneho suboru-------------------");
-            while ((line = br.readLine())!=null){
-                System.out.println(line);
-            }
-            System.out.println("-----------Koniec vypisu ulozeneho suboru--------------");
-        }catch (IOException ioex){
-            ioex.printStackTrace();
-        }
-        //------------------------vypis suboru pomocou readAllLines()-----------------------------------
-        try {
-            System.out.println("-------------------vypis suboru pomocou readAllLines-------------------");
-            //pri
-            Files.readAllLines(novySubor, Charset.forName("UTF-8")).forEach(System.out::println);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //link k suboru
         //----------------------------prekopirovanie suboru---------------------------------------
         //-----------------------------------copy()-------------------------------------------------
         Path kopirovanySubor = Paths.get(novySubor.getParent().toString()+"\\kopia.noveho.suboru.txt");
@@ -272,8 +247,6 @@ public class TestNio {
             //kopirovanie nefunguje rekurzivne(vnorene), prekopuruje len dany adresar(nie obsah) a subor s obsahom
             //Ak subor uz exituje tak vyhodi FileAlreadyExistsException
             Files.copy(novySubor, kopirovanySubor );
-//            Files.copy(Paths.get(""), new FileOutputStream(""));
-//            Files.copy(new FileInputStream(""), Paths.get(""));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -289,7 +262,6 @@ public class TestNio {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         //-------------------------------vymazanie suboru atomicke a neatomicke------------------------
         //---------------------------------delete()----------------------------------------------------
         try {
@@ -297,6 +269,53 @@ public class TestNio {
             Files.delete(presunutySubor);
             //ak vymazavam adresar a nieje prazdny vrati false
 //            Files.deleteIfExists(presunutySubor);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //-----------------------funkcie vracajuce io.Input/OutputStream, io.BufferedWriter/Reader, Channel---------------------------------
+        //zacinaju slovom new napr.
+        // Files.
+        // newBufferedWriter, newBufferedReader, newOutputStream, newInputStream, newByteChannel
+
+        //vytvorim BufferedWriter pomocou factory a appendujem do existujuceho suboru
+        try(BufferedWriter bw = Files.newBufferedWriter(novySubor, StandardCharsets.UTF_8, StandardOpenOption.APPEND)) {
+            bw.write("test : ľščťžýáíéäň");
+            bw.flush();
+            //bw.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //-------------------------citanie zo suboru------------------------------------------------
+        //-------------------------------newBufferedReader()---------------------------------
+        try(BufferedReader br = Files.newBufferedReader(novySubor,StandardCharsets.UTF_8)){
+            String line;
+            System.out.println("---------------Vypis ulozeneho suboru-------------------");
+            while ((line = br.readLine())!=null){
+                System.out.println(line);
+            }
+            System.out.println("-----------Koniec vypisu ulozeneho suboru--------------");
+        }catch (IOException ioex){
+            ioex.printStackTrace();
+        }
+
+        //-------------------------zapis pomocou write metody-----------------------------------
+        try{
+            ArrayList<String> rows = new ArrayList<>();
+            rows.add("");
+            rows.add("hello APPEND");
+            rows.add("third row");
+            Files.write(novySubor, rows, Charset.defaultCharset(), StandardOpenOption.APPEND);
+        }catch (IOException ioex){
+            ioex.printStackTrace();
+        }
+
+        //------------------------vypis suboru pomocou readAllLines()-----------------------------------
+        //pre textove subory, interne pouziva BufferedReader
+        try {
+            System.out.println("-------------------vypis suboru pomocou readAllLines-------------------");
+            //pri
+            Files.readAllLines(novySubor, Charset.forName("UTF-8")).forEach(System.out::println);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -310,7 +329,7 @@ public class TestNio {
         //nastavenie suboru na hidden, pozor tato operacia je specificka pre kazdy operacny system
         //dane riesenie je pre windows
         try {
-            System.out.println("kopirovany subor pre hidden:"+Files.isHidden(novySubor));
+            System.out.println("kopirovany subor pred hidden:"+Files.isHidden(novySubor));
             Files.setAttribute(novySubor, "dos:hidden", true, LinkOption.NOFOLLOW_LINKS);
             System.out.println("kopirovany subor po hidden:"+Files.isHidden(novySubor));
         } catch (IOException e) {
@@ -348,11 +367,13 @@ public class TestNio {
         }
 
 //        Files.readAttributes()
-        //-----------------read file attributes------------------------------------------------------
+        //-----------------------------read file attributes------------------------------------------------------
         try {
-            //BasicFileAttributes => atributy spolocne pre vsetky OS
-//            DosFileAttributes =>  atributy pre dos
-//            PosixFileAttributes => atributy pre posix = linux, mac, unix
+            /*BasicFileAttributes => atributy spolocne pre vsetky OS
+            DosFileAttributes =>  atributy pre dos/windows
+            PosixFileAttributes => atributy pre posix = linux, mac, unix
+            */
+            //vrati read-only atributy
             BasicFileAttributes bfa = Files.readAttributes(novySubor, BasicFileAttributes.class);
             System.out.println("BasicFileAttrs:");
             System.out.println("creationTime():"+bfa.creationTime().toString());
@@ -368,9 +389,14 @@ public class TestNio {
             e.printStackTrace();
         }
 
-        //BasicFileAttributeView
-        //UserDerfinedFileAttributeView
-        //FileOwnerAttributeView
+        //------------------------------- attribute view---------------------------------------------------------------
+        //view je skupina suvisiacich atributov, vyhodou je ze je viac atributov precitanych naraz, cim sa redukuju
+        //volania javy a operacneho systemu a zvysuje sa performance
+        //vracia modifikovatelne atributy
+        /*BasicFileAttributeView
+        UserDerfinedFileAttributeView
+        FileOwnerAttributeView
+        */
         try {
             BasicFileAttributeView bfaw = Files.getFileAttributeView(
                     novySubor,
@@ -378,6 +404,8 @@ public class TestNio {
             );
             System.out.println("last Modiefied:" + bfaw.readAttributes().lastModifiedTime() + ", last Access:" + bfaw.readAttributes().lastAccessTime() + ", create Time:"+bfaw.readAttributes().creationTime());
             TimeUnit.SECONDS.sleep(5);
+            //jedina write metoda na BasicFileAttributeView, ktorou viem modifikovat
+            //lastModifiedTime, lastAccessTime, createTime
             bfaw.setTimes(FileTime.fromMillis(System.currentTimeMillis()), FileTime.fromMillis(System.currentTimeMillis()), FileTime.fromMillis(System.currentTimeMillis()));
             System.out.println("last Modiefied:" + bfaw.readAttributes().lastModifiedTime() + ", last Access:" + bfaw.readAttributes().lastAccessTime() + ", create Time:"+bfaw.readAttributes().creationTime());
         }catch (IOException ioex){
@@ -479,7 +507,102 @@ public class TestNio {
             e.printStackTrace();
         }
 
+        //-------------------------------traversing directory structure------------------------------------------------
+        //------------------------------Java 7 NIO.2 sposob:------------------------------
+        System.out.println("Java 7 NIO.2 sposob => DirectoryStream");
+        //------------------------------------------DirectoryStream------------------------------
+        //DirectoryStream nepatri ani do Java 8 Stream API ani do Java I/O streams
+        //, len ma taky nepodareny nazov
+        try(DirectoryStream<Path> traverse = Files.newDirectoryStream(Paths.get("resources"))) {
+            //traverzuje len v danom adresary, do subadresarov netraverzuje
+            for(Path elem : traverse){
+                if(elem.getFileName().toString().endsWith("txt")){
+                    System.out.println(elem);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //------------------------------------------FileVisitor------------------------------
+        System.out.println("Java 7 NIO.2 sposob => FileVisitor");
+        FileVisitor<Path> fileVisitor = new FileVisitor<Path>() {
+            /*
+            FileVisitResult.CONTINUE - pokracuj na dalsiu polozku vramci traversu
+            FileVisitResult.SKIP_SIBLINGS - pouzivane len preVisitDirectory a postVisitDirectory metodou
+                                            , vsetkci nenavstiveni, ostavajuci surodenci tohto adresara sa maju
+                                            vynechat. V pripade ze pouzite v preVisitDirectory, tak aj vsetky polozky
+                                            v adresary budu vynechane.
+            FileVisitResult.SKIP_SUBTREE - pouzivane len preVisitDirectory metodou, tento adresa a jeho podadresare
+                                            sa maju vynechat z travers procesu
+            FileVisitResult.TERMINATE - hned ukonci travers po suboroch
+            */
+            @Override
+            //vola sa ked travers narazi na subor, posle aj atributy suboru
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if(file.getFileName().toString().endsWith("txt")){
+                    System.out.println(file);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+            @Override
+            //vola sa ked travers nevie pristupit k suboru, posle chybu, ku ktorej prislo
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                return FileVisitResult.TERMINATE;
+            }
+            @Override
+            //vola sa predtym ako travers pristupi k obsahu adresara, posle aj atributy adresara
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+            @Override
+            //vola sa potom ako travers pristupi k obsahu adresara, posle vynimku v pripade, ze nastala chyba
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+        };
+        //Je mozne pouzit aj SimpleFileVisitor => jednoducha implementacia FileVisitor
+        SimpleFileVisitor<Path> simpleFileVisitor = new SimpleFileVisitor<Path>(){
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if(file.getFileName().toString().endsWith("txt")){
+                    System.out.println(file);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        };
+        try {
+            //traversuje depth-first
+            Files.walkFileTree(Paths.get("resources"), fileVisitor);
+            //traversuje len jednu uroven pod root, teda obsah resources adresara
+            //Files.walkFileTree(Paths.get("resources"), EnumSet.of(FileVisitOption.FOLLOW_LINKS), 1, fileVisitor);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //------------------------------Java 8 NIO.2(Stream API) sposob:------------------------------
+        /*existuju 2 strategie pri traverzovani nejakeho root adresara.
+        depth-first(na hlbku menej pamatovo narocne), breadth-first(na sirku vhodne ked viem, ze napr. hladany subor
+        sa nachadza v leveloch v blizkosti root stromu)
+         */
+        System.out.println("Java 8 NIO.2(Stream API) sposob => Stream");
+        try {
+            /*Stream<T> traverzuje depth-first a lazy(deti nejakeho nodu vramci search procesu sa
+            loaduju, az ked sa dany node dosiahne), hlbka search je Inteber.MAX_VALUE
+            */
+            Stream<Path> traverseDepthFirst = Files.walk(Paths.get("resources"));
+            //traversuje len jednu uroven pod root, teda obsah resources adresara
+            //Stream<Path> traverseDepthFirst = Files.walk(Paths.get("resources"),1/*, FileVisitOption.FOLLOW_LINKS*/);
+            traverseDepthFirst
+                    .filter(path13 -> path13.getFileName().toString().endsWith("txt"))
+                    .forEach(System.out::println);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         //-------------------------------------------WatchService-------------------------------------------------------
+        //uz v Java SE 7
         try {
             WatchService watchService = FileSystems.getDefault().newWatchService();
             Paths.get( System.getProperty("user.dir"))
@@ -520,13 +643,4 @@ public class TestNio {
             e.printStackTrace();
         }
     }
-
-    private static BufferedWriter getBufferedWriter(Path novySubor) throws IOException {
-        if(Files.exists(novySubor)){
-            return Files.newBufferedWriter(novySubor, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
-        }
-        return Files.newBufferedWriter(novySubor, Charset.forName("UTF-8"));
-    }
-
-
 }
