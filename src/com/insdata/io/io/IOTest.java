@@ -25,15 +25,20 @@ public class IOTest {
                 //+File.separator+
                 "resources"
                 +File.separator;
-        File file = new File(resourcesPath+"testFileStream.txt");
-        //pre lepsie odlisenie Path a Absolutnej cesty pouzi relativnu cestu pre filePath lokalneho clena
-        System.out.println("Path suboru "+file.getName()+" je:"+file.getPath());
-        //absolutna cesta napr. ak resourcesPath = ../resources/ => C:/adresar1/../resources/
-        System.out.println("Absolute Path suboru "+file.getName()+" je:"+file.getAbsolutePath());
-        //je absolutna cesta, tak ako je to v adresarovej strukture systemu => C:/adresar1/adresar2/resources/
-        System.out.println("Canonical Path suboru "+file.getName()+" je:"+file.getCanonicalPath());
-        System.out.println("Parent suboru "+file.getName()+" je:"+file.getParent());
 
+        //pre lepsie odlisenie Path a Absolutnej cesty, cannonical path pouzit relative path s ..
+        File testPath = new File("resources/dir1/../dir1/dir2/test.txt");
+        //vypise cestu tak ako je, teda relativnu
+        System.out.println("Path suboru "+testPath.getName()+" je:"+testPath.getPath());
+        //absolutna cesta, pripoji k abs. ceste od root relativnu cestu
+        System.out.println("Absolute Path suboru "+testPath.getName()+" je:"+testPath.getAbsolutePath());
+        //kanonicka cesta, ako by vyvolal getCannonicalPath a potom ju prevedie na jednoznacnu cestu,
+        //spojene s tym je odstranenie . alebo .. z cesty
+        System.out.println("Canonical Path suboru "+testPath.getName()+" je:"+testPath.getCanonicalPath());
+        System.out.println("Parent suboru "+testPath.getName()+" je:"+testPath.getParent());
+        testPath.isFile();
+
+        File file = new File(resourcesPath+"testFileStream.txt");
         //vracia long dlzku suboru, alebo 0L ked subor neexistuje
         System.out.println("dlzka suboru testFileStream.txt:"+file.length());
         System.out.println("Total space particie je:"+file.getTotalSpace());
@@ -141,6 +146,7 @@ public class IOTest {
 
         //---------------------------------FileWriter, FileReader
         //najpouzivanejsie triedy pre pre zapisovanie a citanie textovych dat
+        //nieje mozne zadat kodovanie, pouziva sa ak nam vyhovuje default kodovanie
         String fileReaderPath = resourcesPath+"filereader.txt";
         FileWriter fw = new FileWriter(new File(fileReaderPath));
         FileReader fr = new FileReader(new File(fileReaderPath));
@@ -160,6 +166,7 @@ public class IOTest {
         //---------------------------------BufferedReader, BufferedWriter
         //buffrovany pristup, mozne ho parovat s FileWriter,FileReader
         //taky isty priklad ako pre FileReader/Writer s pouzitim wrapper triedy
+        //tiez nieje mozne zadat kodovanie, ale je moznost zadat velkost buffera
         String bufferedReaderPath = resourcesPath+"bufferedreader.txt";
         BufferedWriter bfWr = new BufferedWriter(new FileWriter(bufferedReaderPath));
         bfWr.write("Tak toto by som necakal, ze sa to tak rýchlo skopííííruje.");
@@ -185,7 +192,7 @@ public class IOTest {
 
         //---------------------------------InputStreamReader, OutputStreamWriter
         //sluzi ako premostenie medzi byte streamami a znakovymi streamami, cita bajty a dekoduje ich do znakov pouzitim
-        //specifikovanej charakterovej sady,
+        //specifikovanej charakterovej kodovacej sady,
         // inac sa pouzivat encoding =>System.getProperty("file.encoding");
 
         //POZOR Charset je uz funkcionalita pridana do NIO od Java SE 4+
@@ -195,7 +202,7 @@ public class IOTest {
         osw.flush();
         osw.close();
         //tuna je pouzity bez Charset, teda pred verziou 1.4
-        InputStreamReader isr = new InputStreamReader(new FileInputStream(resourcesPath+"streamReader.txt"),"windows-1250");
+        InputStreamReader isr = new InputStreamReader(new BufferedInputStream(new FileInputStream(resourcesPath+"streamReader.txt")),"windows-1250");
         System.out.println("Encoding:"+isr.getEncoding()!=null?isr.getEncoding():"null");
         int data;
         List<Character> text = new ArrayList<>();
@@ -233,9 +240,6 @@ public class IOTest {
         pw.format("Dneska je %1$tm.%1te.%1$tY, a počasie vyzerá byť %2$s, ale nedal by som zato ani %3$.2f.%n", new Date(), "slnečno", 2.5);
         pw.flush();
         pw.close();
-
-
-
     }
 
     private static void copyFileWithFileStream(File source, File destination) throws IOException {
@@ -344,6 +348,7 @@ public class IOTest {
                     ", serializujInteger=" + serializujInteger +
                     ", ajMnaSerializuj=" + ajMnaSerializuj +
                     ", initZBloku=" + initZBloku +
+                    ", mnaNeserializuj=" + mnaNeserializuj +
                     '}';
         }
     }
