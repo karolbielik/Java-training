@@ -189,7 +189,7 @@ public class TestNio {
     {
 //        int length = 0xC00000; // 12 MB
         String dataPreZapis = "KOKOTI";
-        int length = dataPreZapis.length();//5 byte-ov
+        int length = dataPreZapis.length();//6 byte-ov
         MappedByteBuffer mappedBuffer = null;
         try(FileChannel channel = new RandomAccessFile(directoryPath +fileName, "rw").getChannel()) {
             mappedBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 5, length);
@@ -200,10 +200,6 @@ public class TestNio {
                 dataPreZapisByteArr[i] =  (byte)(dataPreZapisStringArr[i].charAt(0));
             }
             mappedBuffer.put(dataPreZapisByteArr);
-
-            mappedBuffer.flip();
-            channel.write(mappedBuffer);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
