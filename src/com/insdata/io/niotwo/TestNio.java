@@ -127,7 +127,8 @@ public class TestNio {
 
         //--------------------------------subpath(int,int)----------------------------------------------
         //sluzi na vytvorenie, resp. pouzitie nejakej casti existujuce cesty na vytvorenie danej podcesty v ramci inej cesty
-        //prvy a druhy parameter nemozu byt tie iste cisla a max hodnota parametra moze byt max n, ak by bol n+1 tak vyhodi IllegalArgumentException
+        //prvy a druhy parameter nemozu byt tie iste cisla a max hodnota parametra moze byt max n
+        //, ak by bol n+1 tak vyhodi IllegalArgumentException
         //root nieje zahrnuty do indexu, cize v nasom pripade iindex=0 => jedna
         Path path5 = Paths.get("jedna/dva/tri/styri");
         System.out.println("path5 subpath:"+path5.subpath(0/*included*/, 3/*excluded*/));
