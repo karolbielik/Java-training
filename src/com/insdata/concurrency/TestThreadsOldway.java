@@ -1,7 +1,5 @@
 package com.insdata.concurrency;
 
-import org.omg.PortableServer.THREAD_POLICY_ID;
-
 /**
  * Created by karol.bielik on 15.8.2017.
  */
@@ -11,7 +9,7 @@ public class TestThreadsOldway {
         Thread thread1 = new Thread(new RunTask());
         thread1.start();
 
-        RunThreadTask runThreadTask = new RunThreadTask();
+        CustomThread runThreadTask = new CustomThread();
         runThreadTask.start();
 
         Thread thread2 = new Thread(
