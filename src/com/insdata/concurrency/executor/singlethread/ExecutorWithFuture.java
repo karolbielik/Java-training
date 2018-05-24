@@ -13,6 +13,7 @@ public class ExecutorWithFuture {
         Future<String> res=null;
         try {
             //-------------------------------submit---------------------------------------------------
+            //pouzivame submit(Callable<T>), ktora vracia T a moze vyhodit Exception, Runnable verzia toto nemoze.
             res = service.submit(() -> {
                 //zabrzdime task, aby sme simulovali
                 //dlhsie spracovavanie
