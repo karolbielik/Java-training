@@ -1,4 +1,4 @@
-package com.insdata.concurrency;
+package com.insdata.concurrency.executor.scheduler;
 
 import java.util.concurrent.*;
 
@@ -10,7 +10,7 @@ public class TestThreadsScheduler {
     public static void main(String[] args) {
         /*---------------------------------------single-threaded service---------------------------------------------*/
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        //obdobne mozem pouzit multy-threaded executor
+        //obdobne mozem pouzit multi-threaded executor
         //rozdiel je v tom ze pre kazdy task sa priradi dalsi thread z pool
 //        service = Executors.newScheduledThreadPool(5);
         Object res = null;
