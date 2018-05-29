@@ -26,7 +26,7 @@ public class ExecutorThreadPool {
         //Ak mam task, ktory zatazuje procesor viac, tak vytvaram menej threadov a ak mam task, ktory je viac zavisly
         //na externych resoursoch(DB, internet)tak mozem pouzit viac threadov
 
-        //1 core(fyzisky procesor) moze vykonavat simultanne dva procesy, teda ma 2 logicke procesory.
+        //1 core(fyzicky procesor) moze vykonavat simultanne dva procesy, teda ma 2 logicke procesory.
         //Toto sa dosiahne pomocou Hyper Threading technologie(od Pentium 4 rok 2002)
         //=> Duplikaciou registovej casti procesora(virtualny procesor). Potom sa aplikacii javi, akoby boli 2 procesory.
         //Druhy virtualny procesor moze vyuzivat iba tie prostriedky skutocneho procesora,
@@ -66,7 +66,7 @@ public class ExecutorThreadPool {
         }
         if(service != null){
             try {
-                //blokuje po dobu zadaneho casu(5), alebo ked vsetky thready skoncia skor ako tento case
+                //blokuje po dobu zadaneho casu(5), alebo ked vsetky thready skoncia skor ako tento cas
                 service.awaitTermination(5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();

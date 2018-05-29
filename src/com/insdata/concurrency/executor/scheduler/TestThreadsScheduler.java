@@ -13,9 +13,11 @@ public class TestThreadsScheduler {
         //case ziadny volny thread pre spustenie operacie.
 
         /*---------------------single(multi)-threaded scheduler service s jednorazovym spustenim tasku----------------*/
+        //-------------------------newSingleThreadScheduledExecutor----------------------/
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         //obdobne mozem pouzit multi-threaded executor
         //rozdiel je v tom ze pre kazdy task sa priradi dalsi thread z pool
+        //------------------------------newScheduledThreadPool--------------------------/
 //        service = Executors.newScheduledThreadPool(5);
         Object res = null;
         String res1 = null;

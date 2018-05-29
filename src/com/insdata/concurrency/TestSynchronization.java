@@ -1,6 +1,5 @@
 package com.insdata.concurrency;
 
-import java.sql.Time;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +46,9 @@ public class TestSynchronization {
         //oproti synchronizacii ma hlavny rozdiel v tom, ze sa ostatne concurrentne vlakna neblokuju
         //teda implementujem pre taky usecase, kde nemusim zabezpecit nevyhnutne, ze kazde vlakno updatuje hodnotu
         boolean ret = atomicPocet.compareAndSet(currentValue, newValue);
+        //pomocou getAndAdd mozem zabezpecit opakovanie operacie compareAndSet zakial nebude incrementacia uspesna
+        atomicPocet.getAndAdd(3);
+        //kontrolujem ci bola atomic (CAS-compare and swap) operacia uspesna
         if(ret){
             System.out.println("[ThreadId]"+Thread.currentThread().getId()+" -> Successfully set value:"+ (newValue)+" ");
         }else{
@@ -67,7 +69,7 @@ public class TestSynchronization {
         TestSynchronization ts = new TestSynchronization();
         ExecutorService service = Executors.newCachedThreadPool();
         //---------------------------synchronized block-----------------------------------
-        //uplne zosinchronizovana premenna
+        //uplne zosynchronizovana premenna
         try {
             for(int i = 0;i<10;i++)
                 service.submit(() -> ts.pridajASpocitaj());
@@ -82,7 +84,7 @@ public class TestSynchronization {
         }
 
         //------------------------------atomic integer---------------------------------
-        //nieje uplen zosynchronizovana, obcas sa moze satat ze update atomicInteger
+        //nieje uplne zosynchronizovana, obcas sa moze stat ze update atomicInteger
         //nebude vzdy uspesny, ale je to efektivnejsie ako reentrant lock, lebo sa jedna
         //o menej narocnu operaciu lokovania ako v pripade reentrant lock. Vacsina threadov
         //sa preto dostane k neblokovanej premennej
@@ -100,7 +102,7 @@ public class TestSynchronization {
         }
 
         //------------------------------reentrant lock---------------------------------
-        //najnakladnejsia operacia lokovania, preto sa pri rychlo spracovani thready nedostanu
+        //najnakladnejsia operacia lokovania, preto sa pri rychlom spracovani thready nedostanu
         //k zalokovanemu bloku
         try {
             service = Executors.newCachedThreadPool();
