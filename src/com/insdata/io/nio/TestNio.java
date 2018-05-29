@@ -43,8 +43,8 @@ public class TestNio {
     public static void main(String[] args) {
         String fileName = "random.access.file.txt";
 
-        readIOSposob(fileName);
-        readNIOSposob(fileName);
+//        readIOSposob(fileName);
+//        readNIOSposob(fileName);
         System.out.println("files processing finished");
 
         //mapovanie casti suboru na buffer
@@ -64,17 +64,14 @@ public class TestNio {
             - channel vzdy zapisuje do alebo cita z buffer-a
              */
             try(FileChannel channel = raf.getChannel()) {
+                //dalsi sposob ako je mozne vytvorit channel
                 //FileChannel channel1 = FileChannel.open(Paths.get(directoryPath + fileName),StandardOpenOption.READ, StandardOpenOption.WRITE);
-                //ByteBuffer buffer = ByteBuffer.allocate(536870912);
-                //v pripade, ze pracujem s velkymi subormi tak alokujem konstantnu velkost aby som nesportreboval pamat
-//            ByteBuffer buffer = ByteBuffer.allocate(1024);
-                //allocate 4MB
-//            ByteBuffer buffer = ByteBuffer.allocate(4*1024*1024);
-                //velkost buffer alokovana musi byt parne cislo
+                //v pripade, ze pracujem s velkymi subormi, tak alokujem konstantnu velkost,
+                // aby som nesportreboval pamat(OutOfMemoryException), potom uprednostnim
+                //alokaciu mensej casti pamate, ktoru spracovavam postupne v cykloch
+                //napr. alokujem 4MB =>  ByteBuffer buffer = ByteBuffer.allocate(4*1024*1024);
+                //velkost buffer alokovana musi byt parne cislo, aby nam fungoval tento priklad
                 ByteBuffer buffer = ByteBuffer.allocate(4);
-                //v pripade malych suborov mozem nacita data naraz => POZOR ak by som natrafil na velky subor tak, nasledujuci
-                //riadok moze vyhodit OutOfMemoryException
-//            ByteBuffer buffer = ByteBuffer.allocate(channel.size()>Integer.MAX_VALUE?Integer.MAX_VALUE:(int)channel.size());
 
                 long startTime = System.currentTimeMillis();
 
@@ -86,7 +83,7 @@ public class TestNio {
                 //Moze byt max rovna kapacite -1.
                 //Limit - je limit, ktory urcuje kolko dat mozeme z bufra citat.
                 // Je zavisly na read/write mode. V pripade zapisu sa Limit=Kapacita
-                //Ak flip(nem) zo zapisovanieho modu do citacieho, limit je nastaveny na write
+                //Ak flip-nem zo zapisovanieho modu do citacieho, limit je nastaveny na write
                 //poziciu write modu.
 
             /*
@@ -120,7 +117,6 @@ public class TestNio {
 
                 int readDataCount = 0;
                 while ((readDataCount = channel.read(buffer)) > 0) {
-                    //spracovanie dataRead nasleduje TU:
                     //po nacitani dat do buffer musim flipnut na read mode
                     buffer.flip();
                     while (buffer.hasRemaining()) {
@@ -134,7 +130,7 @@ public class TestNio {
                     buffer.flip();
                     channel.position(channel.position()-readDataCount);
                     channel.write(buffer);
-                    //vycistim buffer kvoli nacitaniu dalsich dat
+                    //pripravim buffer na dalsie citanie dat
                     buffer.clear();
                 }
                 long endTime = (new Date()).getTime();
@@ -172,7 +168,7 @@ public class TestNio {
 //                    System.out.println("file pointer:"+raf.getFilePointer());
                 }
             }
-            raf.close();
+//            raf.close();
             long endTime = (new Date()).getTime();
             System.out.println("Duration time blocking:"+(endTime-startTime));
 //            startTime = endTime;
@@ -188,8 +184,8 @@ public class TestNio {
     public static void mappedBufferExample(String fileName)
     {
 //        int length = 0xC00000; // 12 MB
-        String dataPreZapis = "KOKOTI";
-        int length = dataPreZapis.length();//6 byte-ov
+        String dataPreZapis = "VOVNUTRI";
+        int length = dataPreZapis.length();
         MappedByteBuffer mappedBuffer = null;
         try(FileChannel channel = new RandomAccessFile(directoryPath +fileName, "rw").getChannel()) {
             mappedBuffer = channel.map(FileChannel.MapMode.READ_WRITE, 5, length);

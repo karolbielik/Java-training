@@ -76,11 +76,12 @@ public class TestNio {
         }
 */
 
+        //------------------------------toRealPath---------------------------------------
         Path path2 = Paths.get("resources","nio2");
         try {
             //Path a Paths operuje nad tymto objektom aj bez toho, ze by file/folder existovali
             //ale ak pouzijem toRealPath a file/folder neexistuje tak vyhody NoSuchFileException
-            path2.toRealPath(LinkOption.NOFOLLOW_LINKS);
+            path2.toRealPath();//path2.toRealPath(LinkOption.NOFOLLOW_LINKS);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -116,32 +117,32 @@ public class TestNio {
         System.out.println("fileTest1 :: predposledny element cesty aj s rootom:"+fileTest1.getParent());
         System.out.println("fileTest1 :: posledny element cesty:"+fileTest1.getFileName());
 
-        //----------------------isAbsolute(), toAbsolutePath()------------------------------------------
+        //----------------------isAbsolute(), toAbsolutePath(), getParent()---------------------------------
         Path path3 = Paths.get("niekde\\na\\disku");
         System.out.println("Je absolutna cesta:"+path3.getFileName()+":"+path3.isAbsolute());
         Path path4 = path3.toAbsolutePath();
         System.out.println("Je absolutna cesta path3 po toAbsolutePath():"+path3.getFileName()+":"+path3.isAbsolute());
-        System.out.println("Root path3:"+path3.getParent());
+        System.out.println("Parent adresar path3:"+path3.getParent());
         System.out.println("Je absolutna cesta path4:"+path4.getFileName()+":"+path4.isAbsolute());
-        System.out.println("Root path4:"+path4.getParent());
+        System.out.println("Parent adresar path4:"+path4.getParent());
 
         //--------------------------------subpath(int,int)----------------------------------------------
-        //sluzi na vytvorenie, resp. pouzitie nejakej casti existujuce cesty na vytvorenie danej podcesty v ramci inej cesty
-        //prvy a druhy parameter nemozu byt tie iste cisla a max hodnota parametra moze byt max n
-        //, ak by bol n+1 tak vyhodi IllegalArgumentException
-        //root nieje zahrnuty do indexu, cize v nasom pripade iindex=0 => jedna
+        //Pouzitie nejakej casti existujuce cesty, na vytvorenie danej podcesty
+        //Prvy a druhy parameter nemozu byt tie iste cisla a max hodnota parametra moze byt max n+1
+        //, ak by bol vacsi, tak vyhodi IllegalArgumentException
+        //Root nieje zahrnuty do indexu, cize v nasom pripade index=0 => jedna
         Path path5 = Paths.get("jedna/dva/tri/styri");
         System.out.println("path5 subpath:"+path5.subpath(0/*included*/, 3/*excluded*/));
 
         //----------------relativize(Path)----------------------------------------------
         //relativizovanie relativnych ciest
-        Path path6 = Paths.get("kuchyna\\sporak.txt");
-        Path path7 = Paths.get("obyvacka\\gauc.xml");
+        Path path6 = Paths.get("kuchyna\\sporak");
+        Path path7 = Paths.get("obyvacka\\gauc");
         System.out.println(path6.relativize(path7));
         System.out.println(path7.relativize(path6));
         //relativizovanie absolutnych ciest
-        Path path8 = Paths.get("C:\\shareFolder\\sporak.txt");
-        Path path9 = Paths.get("C:\\shareFolder\\obyvacka\\gauc.txt");
+        Path path8 = Paths.get("C:\\shareFolder\\sporak");
+        Path path9 = Paths.get("C:\\shareFolder\\obyvacka\\gauc");
         System.out.println(path8.relativize(path9));
         System.out.println(path9.relativize(path8));
         //ak by  sme chceli zrelativizovat cestu medzi absolutnou a relativnou cestou tak vyhodi exception napr.
@@ -163,17 +164,18 @@ public class TestNio {
 
         //--------------------------------normalize()------------------------------------------------
         Path path10 = Paths.get("C:\\cesta\\do\\..\\zeme\\nezeme");
-        Path path11 = Paths.get("pekna\\rit");
+        Path path11 = Paths.get("velmi\\daleko");
         Path path12;
         System.out.println(path12 = path10.resolve(path11));
         System.out.println(path12.normalize());
 
         //------------------------------------------------java.nio.file.Files-------------------------------------------
         //---------------------------------------------exists()-------------------------------------------
+        //cestu zistuje fyzicky na disku a to po normalize
         System.out.println("Subor existuje:"+Files.exists(path10));
         //---------------------------------------------isSameFile()-------------------------------------------
         try {
-            //ak subory/adresare(nasleduje aj symbolic links) existuju tak zisti ci su dva objekty equal()
+            //ak subory/adresare existuju, tak zisti ci su dva objekty equal()
             //neporovnava obsah suborov, ak su dva identicke subory(obsah a atributy) kazdy na inej lokacii
             //tak to vyhodnoti ako ine subory.
             Path projectFolder = Paths.get( System.getProperty("user.dir"));
@@ -190,7 +192,7 @@ public class TestNio {
                 );
             }
             //DU - miesto hard linku vytvor kopiu suboru a potom porovnaj
-            System.out.println("bufferedreader is same file so symlink:"+Files.isSameFile(
+            System.out.println("bufferedreader je rovnaky s hardlink:"+Files.isSameFile(
                     Paths.get( System.getProperty("user.dir"),"resources/bufferedreaderLink.txt"),
                     Paths.get( System.getProperty("user.dir"),"resources/bufferedreader.txt")));
 
@@ -263,7 +265,7 @@ public class TestNio {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //-------------------------------vymazanie suboru atomicke a neatomicke------------------------
+        //-------------------------------vymazanie suboru ------------------------
         //---------------------------------delete()----------------------------------------------------
         try {
             //ak mazem adresar a nieje prazdny, tak vyhodi exception
@@ -336,9 +338,9 @@ public class TestNio {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //------------------------------isReadable(), isExecutable()------------------------------------------
+        //------------------------------isReadable(), isWritable()------------------------------------------
         System.out.println("novy subor isReadable:"+ Files.isReadable(novySubor));
-        System.out.println("novy subor isExecutable:"+ Files.isExecutable(novySubor));
+        System.out.println("novy subor isWritable:"+ Files.isWritable(novySubor));
         //-----------------------------size()--------------------------------------------------
         //velkost suboru v bajtoch
         try {
@@ -446,14 +448,14 @@ public class TestNio {
             //vymaze custom file attribute
             udfav.delete("myAttribute");
             udfav.list().stream().forEach(s->System.out.println("File atribut vytvoreny uzivatelom, po vymazani atributu myAttribute:"+s));
-            //vyhodi NoSuchFileException
+            //vyhodi NoSuchFileException pretoze sme ho vymazali
             udfav.read("myAttribute", readBb);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         //PosixFileAttributeView => pre linux
-        //iba pre Windows
+        //AclFileAttributeView iba pre Windows
         AclFileAttributeView aclFav = Files.getFileAttributeView(
                 novySubor,
                 AclFileAttributeView.class//,
@@ -583,7 +585,6 @@ public class TestNio {
             e.printStackTrace();
         }
 
-
         //------------------------------Java 8 NIO.2(Stream API) sposob:------------------------------
         /*existuju 2 strategie pri traverzovani nejakeho root adresara.
         depth-first(na hlbku menej pamatovo narocne), breadth-first(na sirku vhodne ked viem, ze napr. hladany subor
@@ -619,12 +620,12 @@ public class TestNio {
             //---------------------------poll--------------------------------------
             //caka 5 sekunt na objavenie sa eventu
             //vrati null ak ziaden event sa neobjavil
-            WatchKey eventOccured = watchService.poll(15, TimeUnit.SECONDS);
-            if(eventOccured != null){
-                for(WatchEvent event : eventOccured.pollEvents()){
-                    event.context().toString();
-                }
-            }
+//            WatchKey eventOccured = watchService.poll(15, TimeUnit.SECONDS);
+//            if(eventOccured != null){
+//                for(WatchEvent event : eventOccured.pollEvents()){
+//                    event.context().toString();
+//                }
+//            }
 
             //---------------------------take--------------------------------------
             //caka zakial sa neobjavi nejaky z registrovanych eventov
