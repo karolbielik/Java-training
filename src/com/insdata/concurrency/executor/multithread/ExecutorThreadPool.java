@@ -53,13 +53,14 @@ public class ExecutorThreadPool {
                     }
             );
 
+//            for (Future<String> future : futures) {
+//                System.out.println(future.get());
+//            }
+
             //ak nepotrebujem mat vysledok z Future pre ziadny task,
             //namiesto toho, aby som cakal na kazdy vysledok v cykle,
             //mozem pouzit na service awaitTermination vid. dole.
             //Musim zavolat najskor service.shutdown() a potom pouzit awaitTermination.
-//            for (Future<String> future : futures) {
-//                System.out.println(future.get());
-//            }
         }
         finally {
             if(service!=null)service.shutdown();
