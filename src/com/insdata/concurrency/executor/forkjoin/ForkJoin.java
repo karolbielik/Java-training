@@ -24,7 +24,7 @@ public class ForkJoin {
 
         //------------------------Recursive Action------------------------------
         //rozdeli string na zadanu dlzku a vykona tieto subtasky bez navratovej hodnoty
-        CustomRecursiveAction forkJoinAction = new ForkJoin.CustomRecursiveAction("Ahojte ja som stary dobry processor. Kdo je vac, ked nie ja.");
+        CustomRecursiveAction forkJoinAction = new ForkJoin.CustomRecursiveAction("Toto je text, ktory sa spracuje paralelne a zvacsi vsetky pismena.");
         System.out.println("data:"+forkJoinAction.getData());
 
         ForkJoinPool.commonPool().execute(forkJoinAction);
