@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by karol.bielik on 16.8.2017.
  */
-public class TestSynchronization {
+public class Test03Synchronization {
 
     Integer pocet = new Integer(0);
 
@@ -60,13 +60,13 @@ public class TestSynchronization {
     private static Integer staticPocet = new Integer(0);
     public static /*synchronized*/ void staticPridajASpocitaj(){
         //preto potrebujeme zatomizovat cely blok, mozem blokovat aj na objekt trieda
-        synchronized (TestSynchronization.class){
+        synchronized (Test03Synchronization.class){
             System.out.print((++staticPocet)+" ");
         }
     }
 
     public static void main(String[] args) {
-        TestSynchronization ts = new TestSynchronization();
+        Test03Synchronization ts = new Test03Synchronization();
         ExecutorService service = Executors.newCachedThreadPool();
         //---------------------------synchronized block-----------------------------------
         //uplne zosynchronizovana premenna

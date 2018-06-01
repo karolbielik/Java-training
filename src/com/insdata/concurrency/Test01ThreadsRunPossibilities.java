@@ -8,7 +8,7 @@ import java.util.concurrent.*;
 /**
  * Created by karol.bielik on 31.7.2017.
  */
-public class TestThreadsRunPossibilities {
+public class Test01ThreadsRunPossibilities {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         //----------------------------jeden sposob ako spustit thread -viac pouzivany-------------------------------
         Thread thread1 = new Thread(new RunTask());

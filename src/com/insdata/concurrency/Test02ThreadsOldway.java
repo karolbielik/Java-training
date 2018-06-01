@@ -3,11 +3,15 @@ package com.insdata.concurrency;
 /**
  * Created by karol.bielik on 15.8.2017.
  */
-public class TestThreadsOldway {
+public class Test02ThreadsOldway {
     public static void main(String[] args) {
 
         Thread thread1 = new Thread(new RunTask());
+        //status bude NEW lebo som este thread nespustil
+        System.out.println("thread1.status:"+thread1.getState().name());
         thread1.start();
+        //status bude RUNNABLE po spusteni threadu
+        System.out.println("thread1.status:"+thread1.getState().name());
 
         CustomThread runThreadTask = new CustomThread();
         runThreadTask.start();
@@ -47,7 +51,7 @@ public class TestThreadsOldway {
                     Thread.sleep(1000);
                     System.out.println("Cakal som minimalne 1 sekundu. Teraz je " + System.currentTimeMillis());
                 } catch (InterruptedException e) {
-                    //spiaci thread moze by preruseny z vonka, tu sa handluje takyto pripad
+                    //spiaci thread moze byt preruseny z vonka, tu sa handluje takyto pripad
                     //co sa ma robit ak mi niekto prerusil moj spiaci thread
                     e.printStackTrace();
                 }
@@ -126,7 +130,7 @@ public class TestThreadsOldway {
         threadC.start();
 
     /*--------------------------------interakcia medzi threadmi pomocou wait, notify, notifyAll-----------------------*/
-        //tieto metody musia byt volane zo synchronizovaneho kontextu, lebo thread ktory caka na nejaky objekt beziaci v
+        //tieto metody musia byt volane zo synchronizovaneho kontextu, lebo thread, ktory caka na nejaky objekt beziaci v
         //inom vlakne, musi vlastnit jeho lock
 
         //pocitadlo bude pocitat a vzdy pri dosiahnuti isteho cisla informuje konzolu, ze dosiahlo isty pocet
@@ -144,7 +148,7 @@ public class TestThreadsOldway {
                             System.out.println("Dosiahlo som hodnotu:"+hodnotaPocitadla);
                             Thread.currentThread().notify();
                             //v pripade ze by sme mali viac konzol, ktore cakaju na pocitadlo
-                            //a chcem aby vsetky zachitili zmenu stavu na pocitadle tak pouzijem notifyAll()
+                            //a chcem aby vsetky zachytili zmenu stavu na pocitadle tak pouzijem notifyAll()
                             //ak pouzijem notify(), tak sa zavola len jedna z konzol cakajucich nieje garantovane ktora
 //                            Thread.currentThread().notifyAll();
                         }
