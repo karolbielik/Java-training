@@ -1,10 +1,6 @@
 package com.insdata.funkcne;
 
-import com.insdata.funkcne.interfeis.OknoKontrolovatelne;
 //import org.apache.commons.lang3.StringUtils;
-
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * Created by karol.bielik on 28.3.2017.
@@ -28,47 +24,5 @@ BinaryOperator<T>       2               (T, T) T        apply
 public class FunkcneInterfeisTest {
 
     public static void main(String[] args) {
-        Okno okno = new Okno();
-        boolean vonkuFucka = true;
-
-        //parameter je funkcne interface OknoKontrolovatelne
-        //mozem priamo zadat lambda vyraz
-        okno.zavriOkno(()->vonkuFucka);
-        //alebo mozem zadat funkciu ktora vracia implementovane funkcne interface
-        okno.otvorOkno((new KontrolorOkna()).mozemOtvoritKontrolovatelneOkno(vonkuFucka));
-
-        KontrolorOkna kontrolorOkna = new KontrolorOkna();
-        //lambda vyraz mozem priradit funkcnemu interface, ktore zodpoveda signature metody
-        Supplier<Boolean> skusCiMamOtvoritOkno = ()->kontrolorOkna.mozemOtvoritOkno(vonkuFucka);
-        //parameter je Supplier funkcne interface ktore je definovany v java 8
-        okno.otvorOknoStandart(skusCiMamOtvoritOkno);
-
-        //implementuje funkcne interface lambda vyrazom
-        Predicate<Boolean> kontrolaZavretiaOkna = (t) -> KontrolorOkna.mozemZavrietOkno(t);
-        //na danej implementacii zavolam implementovanu metodu
-        okno.zavriOknoStandardTest(kontrolaZavretiaOkna.test(vonkuFucka));
-
-        //implementujem funkcne interface referenciou na metodu,
-        // ktorej signatura v parametrovej casti metody zodpoveda signature metody
-        //vo funkcnom interface
-        kontrolaZavretiaOkna = KontrolorOkna::mozemZavrietOkno;
-        //tymto sposobom predam parameter do implementacie interface
-        okno.zavriOknoStandardTest(kontrolaZavretiaOkna.test(vonkuFucka));
-
-    }
-}
-
-class KontrolorOkna{
-
-    public boolean mozemOtvoritOkno(Boolean vonkuFuka){
-        return !vonkuFuka;
-    }
-
-    public static Boolean mozemZavrietOkno(Boolean vonkuFuka){
-        return vonkuFuka;
-    }
-
-    public OknoKontrolovatelne mozemOtvoritKontrolovatelneOkno(Boolean vonkuFucka){
-        return ()-> !vonkuFucka;
     }
 }
