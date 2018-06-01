@@ -1,8 +1,0 @@
-test rôznych typov
-1
-true
-formátovaný text americký
-This is american style date 10 October 2017 and number 3.140000 .
-Toto je sloenský dátum 10 októbra 2017 a číslo 3,140000 .
-Táto deska má  1.20 metra a váži 100 kilov.
-Dneska je 10.11.2017, a počasie vyzerá byť slnečno, ale nedal by som zato ani 2.50.
