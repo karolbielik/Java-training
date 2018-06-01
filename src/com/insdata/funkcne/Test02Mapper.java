@@ -1,5 +1,6 @@
 package com.insdata.funkcne;
 
+import com.insdata.funkcne.mapper.Mappable;
 import com.insdata.funkcne.mapper.Mapper;
 
 public class Test02Mapper {
@@ -25,6 +26,9 @@ public class Test02Mapper {
         //konstruktor
         Mapper<String> mapperFromString = Mapper.of("888");
         Integer integerFromStringCezMethodPointer = mapperFromString.map(Integer::new).getMappableObject();
+
+        Mapper<Long> lng = Mapper.of(new Long(4434534534345L));
+        String s = lng.transform((aLong -> aLong*0)).map((aLong -> aLong.toString())).getMappableObject();
     }
 
     private String mapToString(Integer integer){

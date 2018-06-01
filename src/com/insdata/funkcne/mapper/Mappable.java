@@ -15,10 +15,17 @@ public interface Mappable<T> {
     //default metodu s rovnakou signaturou.
     T getMappableObject();
 
-    default <R> Mappable<R> map(Function<T, R> mapFuntion){
+    default <R> Mappable<R> map(Function<T, R> mapFunction){
         return ()->{
             T object = Mappable.this.getMappableObject();
-            return object == null ? null : mapFuntion.apply(object);
+            return object == null ? null : mapFunction.apply(object);
+        };
+    }
+
+    default Mappable<T> transform(Function<T, T> fransformFunction){
+        return () ->{
+            T object = Mappable.this.getMappableObject();
+            return object == null ? null : fransformFunction.apply(object);
         };
     }
 }
