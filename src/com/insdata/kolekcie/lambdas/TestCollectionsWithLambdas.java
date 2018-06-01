@@ -56,13 +56,13 @@ public class TestCollectionsWithLambdas {
         System.out.println(oblubenePolozky);
         //----------------------computeIfPresent()-------------------------------
         //zavola BiFunction ked sa kluc nachadza v mape
-        BiFunction computeBiFunct = (a,b)->{
-            System.out.println("compute zavolane pre "+a);
+        BiFunction computeBiFunct = (key,value)->{
+            System.out.println("compute zavolane pre "+key);
             return "compute if present";
         };
 
-        Function computeFunct = (a)->{
-            System.out.println("compute zavolane pre "+a);
+        Function computeFunct = (key)->{
+            System.out.println("compute zavolane pre "+key);
             return "compute if absent";
         };
 
@@ -84,6 +84,28 @@ public class TestCollectionsWithLambdas {
         oblubenePolozky.computeIfAbsent("Dominik", computeFunct);
         System.out.println("po computeIfAbsent");
         System.out.println(oblubenePolozky);
+
+        //Zakladne pravidla funkcionality merge, computeIfPresent, computeIfAbsent
+        /*
+        scenar              |     merge                 |       computeIfPresent        |       computeIfAbsent
+        ---------------------------------------------------------------------------------------------------------
+        kluc je v mape          vysledok funkcie            nic sa nevola                   vysledok funkcie
+        kluc nieje v mape       prida novu hodnotu          vysledok funkcie                nic sa nevola
+        pouzite func. interf.   BiFunkcia(exist.hodnota,    BiFunkcia(kluc, exist.hodn.)    Function(kluc)->
+                                nova hodnota)->nova         ->nova hodnota                  nova hodnota
+                                hodnota
+=================================================================================================================================
+        //Merge and compute methods when nulls are involved
+       -----------------------------------------------------------------------------------------------------------------------
+        Key has         |     Mapping
+                        |     functions returns    |   merge                |   computeIfAbsent         | computeIfPresent
+       -----------------------------------------------------------------------------------------------------------------------
+       null value in map           null                Remove key from map.   Do not change map.         Do not change map.
+
+
+
+
+        */
 
     }
 }
