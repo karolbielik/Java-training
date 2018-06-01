@@ -28,6 +28,8 @@ class Okno{
 
     //inner trieda je trieda ktora je definovana vo vnutri inej triedy
     //rovnako ako atribut alebo metoda
+    //Moze pristupovat aj k instancnym aj k statickym zlenom vonkajsej triedy
+    //oficialne sa vola non-static nested class alebo inner class.
     class ButtonClickedListenerImpl implements ButtonClickedListener{
         private int clickCount;
         @Override

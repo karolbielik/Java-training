@@ -13,7 +13,9 @@ public class StatickaInnerTriedaTest {
 class VonkajsiaTrieda{
     //vnutorna trieda je oznacena slovom static
     //vyjadruje to ze sa jej instancia moze vytvorit bez toho aby som mal instanciu vonkajsej tiedy
-    //tak ako je to pri statickych clenoch.
+    //tak ako je to pri statickych clenoch. Ide v podstate o namespace. Tato vnutorna trieda nemoze pristupovat
+    //k instancnym premmennym vonkajsej triedy, iba k jej statickym clenom.
+    //oficialne sa vola  nested static class, nie inner class. Inner class sa nazyvaju non-static nested classes.
     private int clenVonkajsejTriedy;
     private static int statClenVonkajsejTriedy;
 
