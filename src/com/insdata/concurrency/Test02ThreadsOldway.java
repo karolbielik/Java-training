@@ -1,5 +1,7 @@
 package com.insdata.concurrency;
 
+import java.util.concurrent.Semaphore;
+
 /**
  * Created by karol.bielik on 15.8.2017.
  */
@@ -60,6 +62,8 @@ public class Test02ThreadsOldway {
         thread.start();
 
         /*----------------------------------------Priority threadu  yield--------------------------------------------*/
+        //Pri yield prave beziaci thread data signal thread scheduleru, ze je ochotny prepustit procesorovy cas inemu
+        //threadu v ramci tej iste alebo vyssej priority.
         //thread priority su od 1 po 10
         //prave beziaci thread by mal mat rovnu alebo vyssiu prioritou(napr.7) ako thready cakajuce v poole, ak do poolu pride thread
         //s vyssou prioritou (8), tak prebiehajuci thread 7 sa da do stavu runnable a thread 8 do stavu running.
@@ -69,26 +73,19 @@ public class Test02ThreadsOldway {
         thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Subthread priority:" + Thread.currentThread().getPriority() + ":ThreadId:" + Thread.currentThread().getId());
-//                Thread.currentThread().setPriority(6);
-//                System.out.println("Subthread priority po setPriority:"+Thread.currentThread().getPriority());
-                //scheduler beziaci thread da do stavu runnable a vyberie z poolu iny thread s rovnakou prioritou
-                Thread.yield();
-                System.out.println("Po yield threadId:" + Thread.currentThread().getId());
+                for(int i = 0; i<7;i++){
+                    System.out.println("Subthread priority:" + Thread.currentThread().getPriority() + ":ThreadId:" + Thread.currentThread().getId());
+                }
             }
         });
-
-        Thread thread3 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("Subthread priority:" + Thread.currentThread().getPriority() + ":ThreadId:" + Thread.currentThread().getId());
-            }
-        });
-        //defaultna priority pre subthread je taka ista ako pre main thread ale mozem ju zmenit
-        thread.setPriority(6);
-        thread3.setPriority(6);
+        //5 je default thread priorita, pod ktorou bezi aj hlavne vlakno
+        thread.setPriority(5);
         thread.start();
-        thread3.start();
+
+        for(int i = 0;i<7;i++){
+            Thread.yield();
+            System.out.println("main thread priority:" + Thread.currentThread().getPriority() + ":ThreadId:" + Thread.currentThread().getId());
+        }
 
         /*---------------------------------------------join example--------------------------------------------------*/
         Thread threadA = new Thread(new MyRunnable(), "A");
