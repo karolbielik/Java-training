@@ -25,7 +25,7 @@ public class ExecutorWithFuture {
 //                    }
 //                    if(count==5)break;
 //                }
-//  /*1,3*/               Thread.currentThread().sleep(200);
+  /*1,3*/               Thread.currentThread().sleep(200);
 //  /*2*/             Thread.currentThread().sleep(5000);
                 for (int i = 0; i < 5; i++) {
                     System.out.println("submit i-cko:" + i);
@@ -39,7 +39,7 @@ public class ExecutorWithFuture {
 //  /*1*/        Thread.currentThread().sleep(5000);
             //ak submit thread uz dobehol a spravime na nom cancel, tak to nebude mat ziadny efekt
             //aj tak sa bude javit ako canceled=false;
-//  /*2*/        res.cancel(true);
+//  /*1,2*/        res.cancel(true);
             //aj ked je future.isDone=true, mohol task skoncit s exception
             //done je true, ked thread dokonci ci OK alebo s Exception
             System.out.println("{isDone:"+res.isDone()+"}{isCanceled:"+res.isCancelled()+"}");
