@@ -11,6 +11,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class Test03Synchronization {
 
+    //TODO: este eventualne pridat priklad na nutnost pouzitia volatile
+    //TODO: aj priklad na deadlock
+
     Integer pocet = new Integer(0);
 
     private final AtomicInteger atomicPocet = new AtomicInteger(0);
