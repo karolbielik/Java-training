@@ -77,18 +77,26 @@ public class Test01LambdaInterfaces {
 
 
         //----------------------------------UnaryOperator------------------------------------------
-        UnaryOperator<String> addSpace = s -> s.concat(" ");
-        Integer count = 5;
-        UnaryOperator<Integer> addCount = integer -> integer + count;
-        System.out.println("5+5="+addCount.apply(5));
+        //unarna operacia nad stringom
+        UnaryOperator<String> sToUpperCase = s -> s.toUpperCase();
+        System.out.println("String uppercase unari operation:"+sToUpperCase.apply("monkey business"));
+        //unarna operacia nad cislom
+        UnaryOperator<Integer> intIncrement = integer -> integer + 1;//integer++
+        System.out.println("Integer unari operation:"+intIncrement.apply(6));
 
 
         //----------------------------------BinaryOperator-----------------------------------------
-        BinaryOperator<Long> addLongNumbers = (n1, n2) -> n1 + n2;
+        //binarna operacia nad stringom
+        BinaryOperator<String> sConcat = (s1, s2) -> s1.concat(s2);
+        System.out.println("String uppercase unari operation:"+sConcat.apply("monkey", "business"));
+
+        //binarna operacia nad cislom
+        BinaryOperator<Long> addLongNumbers = (n1, n2) -> n1 + n2;//1+1
         System.out.println("add numbers:"+addLongNumbers.apply(3L, 4L));
-        Comparator<String> minStringComparator = (a,b)-> a.compareTo(b);
+
         //-------------------staticke metody v BinaryOperator---------------------------
         //--------------------------------minBy, maxBy----------------------------------
+        Comparator<String> minStringComparator = (a,b)-> a.compareTo(b);
         BinaryOperator<String> minString = BinaryOperator.minBy(minStringComparator);
         System.out.println("Mensi je:"+minString.apply("Hello Dedo", "Hello World"));
     }
