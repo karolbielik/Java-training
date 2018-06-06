@@ -20,7 +20,7 @@ BinaryOperator<T>       2               (T, T) T        apply
 import java.util.Comparator;
 import java.util.function.*;
 
-public class Test01LambdaInterfaces {
+public class Test02LambdaInterfaces {
     public static void main(String[] args) {
         //---------------------------------Supplier------------------------------------------------
         Supplier<Long> lng = () -> new Long(11198754321L);
