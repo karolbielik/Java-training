@@ -7,18 +7,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
-import java.nio.channels.ByteChannel;
+import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.FileChannel;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 /**
  * Created by karol.bielik on 18.9.2017.
@@ -45,10 +39,11 @@ public class TestNio {
 
 //        readIOSposob(fileName);
 //        readNIOSposob(fileName);
+        readNIOAsynchronous(fileName);
         System.out.println("files processing finished");
 
         //mapovanie casti suboru na buffer
-        mappedBufferExample(fileName);
+//        mappedBufferExample(fileName);
     }
 
     //tato funkcia v resoruces/nio/random.access.file.txt zapise byte=4(dec)=>(char='-') do kazdeho 1-heho(neparneho) byte-u
@@ -143,6 +138,22 @@ public class TestNio {
         }
     }
 
+    private static void readNIOAsynchronous(String fileName){
+        try(AsynchronousFileChannel channel = AsynchronousFileChannel.open(Paths.get(directoryPath, fileName), StandardOpenOption.READ, StandardOpenOption.WRITE)) {
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            Future<Integer> operation = channel.read(buffer,0);
+            System.out.println("start waiting:"+System.currentTimeMillis());
+            while(!operation.isDone());
+            System.out.println("end waiting:"+System.currentTimeMillis());
+            buffer.flip();
+            while(buffer.hasRemaining()){
+                System.out.print((char)buffer.get());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     //v resoruces/nio/random.access.file.txt zapise byte=43(dec)=>(char='+') do kazdeho 2-heho(parneho) byte-u
     //velkost alokovaneho pola dataRead musi byt parne cislo
     private static void readIOSposob(String fileName) {
@@ -180,7 +191,7 @@ public class TestNio {
         }
     }
 
-    //zapise niekam do vnutra suboru "KOKOTI"
+    //zapise niekam do vnutra suboru "VOVNUTRI"
     public static void mappedBufferExample(String fileName)
     {
 //        int length = 0xC00000; // 12 MB
