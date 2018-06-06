@@ -1,9 +1,8 @@
 package com.insdata.funkcne;
 
-import com.insdata.funkcne.mapper.Mappable;
 import com.insdata.funkcne.mapper.Mapper;
 
-public class Test02Mapper {
+public class Test03Mapper {
     public static void main(String[] args) {
 
         Mapper<Integer> mapperFromInteger = Mapper.of(new Integer(888));
@@ -20,9 +19,9 @@ public class Test02Mapper {
         * konstruktor
         * */
         //staticka metoda
-        String strIntegerCezMethodPointer = mapperFromInteger.map(Test02Mapper::staticMapToString).getMappableObject();
+        String strIntegerCezMethodPointer = mapperFromInteger.map(Test03Mapper::staticMapToString).getMappableObject();
         //instancna metoda
-        strIntegerCezMethodPointer = mapperFromInteger.map(new Test02Mapper()::mapToString).getMappableObject();
+        strIntegerCezMethodPointer = mapperFromInteger.map(new Test03Mapper()::mapToString).getMappableObject();
         //konstruktor
         Mapper<String> mapperFromString = Mapper.of("888");
         Integer integerFromStringCezMethodPointer = mapperFromString.map(Integer::new).getMappableObject();
