@@ -74,6 +74,16 @@ public class Test04Collectors {
         ));
         System.out.println("Vysledok mapping:"+mappingAnimalsSet);
 
+        //tento ukazkovy priklad nefunguje na mojej java 8_121
+        /*
+        Stream<String> animalsStream = Stream.of("lions", "tigers", "bears");
+        Map<Integer, Optional<Character>> map = animalsStream.collect(
+        Collectors.groupingBy(
+        String::length,
+        Collectors.mapping(s -> s.charAt(0),
+        Collectors.minBy(Comparator.naturalOrder()))));
+        System.out.println(map); // {5=Optional[b], 6=Optional[t]}
+        * */
         //----------------------------------------partitioningBy---------------------------------------
         //vytvori mapu grup na zaklade specifikovaneho predikatu
         //je podobne ako grouping, ale zgrupy elementy streamu do dvoch skupin na zakladen predicate funkcie
