@@ -54,15 +54,25 @@ public class Test04Collectors {
         //najde najvacsie/najmensie Optional<T> elementy
         //-----------------------------------------mapping---------------------------------------------
         //Prida dalsi level kolektorov
-        //chcem elementy v jednotlivych groupach zoradit abecedne na zaklade prveho pismena elementu
-        animals = supplyAnimals.get();
-        Map<Integer, Optional<Character>> mappingAnimals = animals.collect(Collectors.groupingBy(String::length
+        Supplier<Stream<String>> supplyZmeska = ()->Stream.of("medved", "medaky", "tava", "tula", "somar", "sonar", "kobyla", "kibana");
+        //chcem zgrupit dane stringy na zaklade dlzdy a potom vytiahnut prve zaciatocne pismena
+        animals = supplyZmeska.get();
+        Map<Integer, List<Character>> mappingAnimalsList = animals.collect(Collectors.groupingBy(String::length
                                             ,Collectors.mapping(
-                                                s->s.charAt(0)
-                                                ,Collectors.minBy(Comparator.naturalOrder())
+                                                s->s.charAt(0),
+                                                Collectors.toList()
                                             )
                                     ));
-        System.out.println("Vysledok mapping:"+mappingAnimals);
+        System.out.println("Vysledok mapping:"+mappingAnimalsList);
+        //chcem zgrupit dane stringy na zaklade dlzdy a potom vytiahnut prve zaciatocne pismena bez opakovania
+        animals = supplyZmeska.get();
+        Map<Integer, Set<Character>> mappingAnimalsSet = animals.collect(Collectors.groupingBy(String::length
+                ,Collectors.mapping(
+                        s->s.charAt(0),
+                        Collectors.toSet()
+                )
+        ));
+        System.out.println("Vysledok mapping:"+mappingAnimalsSet);
 
         //----------------------------------------partitioningBy---------------------------------------
         //vytvori mapu grup na zaklade specifikovaneho predikatu
