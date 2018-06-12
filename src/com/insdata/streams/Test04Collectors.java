@@ -95,6 +95,9 @@ public class Test04Collectors {
 
         //-----------------------------------summingDouble, summingInt, summingLong--------------------
         //vypocita sumu pre primitivov v streame
+        animals = supplyAnimals.get();
+        //spocitam dlzku vsetkych slov v streame
+        Integer countLength = animals.collect(Collectors.summingInt(s->s.length()));
 
         //-------------------------------------------toList--------------------------------------------
         animals = supplyAnimals.get();
