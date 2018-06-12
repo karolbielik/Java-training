@@ -20,7 +20,7 @@ public class Test02Streams {
             Terminal operation - produkuje vysledok
         */
         /*-----------------------------------------Praca so streamami--------------------------------------------------*/
-        //---------------------------------------Moznosti vytvarania streamu--------------------
+        //---------------------------------------Moznosti vytvarania streamu (zdroja)--------------------
         Stream<String> stringStream = Stream.empty();
         Stream<String> stringStreamSingle = Stream.of("1");
         Stream<String> stringStreamFromArr = Stream.of("1","2","3");
