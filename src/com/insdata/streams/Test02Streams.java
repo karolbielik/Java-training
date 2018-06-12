@@ -157,8 +157,8 @@ public class Test02Streams {
         //!nemozem pouzit String(je immutable) ako v reduce lebo robim zmeny na mutable objekte,
         // teda na obsahu samotneho objektu
         System.out.println(streamOfAnimals.collect(()-> new StringBuilder()
-                                , (response,element)-> response.append(" ").append(element)//toto je volane pre kazdy element
-                                , (response1, response2) -> response1.append(",").append(response2)));//toto je volane pre kazdy vysledok z predchadzajuceho riadku
+                  /*akumulator*/    , (response,element)-> response.append(" ").append(element)//toto je volane pre kazdy element
+                /*kombinator*/      , (response1, response2) -> response1.append(",").append(response2)));//toto je volane pre kazdy vysledok z predchadzajuceho riadku
         //----------------------------------Collectors-------------------------------------------------------------
         //existuju v Collectors preddefinovane kolektory, ktore nam vysledky zozbieraju do Listu alebo Setu
         //alebo typu ktory uvedieme v suppliery, nemusime potom vypisovat accumulator a combiner
@@ -229,45 +229,6 @@ public class Test02Streams {
                 .map(x -> String.format("%1$,.2f", x))
                 .forEach(System.out::println);
 
-        /*----------------------------------Paralelny pristup -------------------------------------------------------*/
-        Arrays.asList(1,2,3,4,5,6,7,8).stream().forEach(s -> System.out.print(s+" "));
-        //mozne pracovat s paralelnymi streamamy na Collection interface cez parallelStream metodu
-        Arrays.asList(1,2,3,4,5,6,7,8).parallelStream().forEach(s -> System.out.print(s+" "));
-        //alebo priamo na Stream pracovat z parallel streamom
-        Stream<Integer> intStream = streamIntegerSupplier.get();
-        //kedze toto je spracovavane paralelne, tak vystup bude vzdy nepredvidatelny
-        intStream.parallel().forEach(s -> System.out.print(s+" "));
-        //s nejakou reziou navyse zarucime, ze vypis bude v poradi
-        intStream = streamIntegerSupplier.get();
-        intStream.parallel().forEachOrdered(s -> System.out.print(s+" "));
 
-        intStream = streamIntegerSupplier.get();
-        //vysledok je vzdy nepredpokladatelny, kedze sa jedna o paralelne spracovanie
-        System.out.println(intStream.parallel().findAny().get());
-        //findFirst, limit, skip pracuju pomalsie v paralelnom prostredi, pretoze paralelny task musi v tomto
-        //pripade koordinovat thready v synchronizovanym sposobom.
-        intStream = streamIntegerSupplier.get();
-        //potom vrati vzdy konsistentny vysledok aj na seriovom aj paralelnom streame
-        System.out.println(intStream.skip(5).limit(2).findFirst());
-
-        intStream = streamIntegerSupplier.get();
-        //unordered stream povie JVM, ze ak by mal uplatnit ordered-based operaciu, tak poradie moze ignorovat
-        //napr. skip(5) nepreskoci prvych 5 prvkov, ale 5 nejakych prvkov
-        //tymto sposobom sa moze zrychlit paralelne spracovanie
-        intStream.unordered().parallel().skip(3).forEach(s->System.out.print(s+" "));
-
-        //paralelne streamy v pripade reduce funkcie sa spravaju rovnako ako synchronne v pripade, ze
-        //dodrzime pravidla parametrov funkcie reduce
-        //prvy parameter identity combiner.apply(identity,u == u)
-        //druhy param. accumulator musi byt asociativny (a op b)opc == a op (b op c)
-        //treti param. combiner musi by asociativny combiner.apply(u,accumulator.apply(identity,t)) == accumulator.apply(u,t)
-        intStream = Stream.of(1,2,3,4,5,6,7,8);
-        intStream.parallel().reduce(0, (a,b)-> a+b);//bude vracat rovnaky vysledok ako synchronny stream
-
-        intStream = Stream.of(1,2,3,4,5,6,7,8);
-        intStream.parallel().reduce(0, (a,b)-> a-b);//tu je problem lebo odcitanie nieje asociativny operator
-
-        intStream = Stream.of(1,2,3,4,5,6,7,8);
-        intStream.parallel().reduce(1, (a,b)-> a+b);//tu je takisto problem lebo sme nedodrzali pravidlo pre prvy parameter
     }
 }
