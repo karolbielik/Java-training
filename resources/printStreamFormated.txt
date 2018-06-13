@@ -1,0 +1,4 @@
+zaciatok print stream serializacie
+koniec print stream serializacie
+Ja som krasny formatovany retazec znakov
+Ja som krasny formatovany retazec znakov

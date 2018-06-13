@@ -1,0 +1,8 @@
+test rôznych typov
+1
+true
+formátovaný text americký
+This is american style date 05 May 2018 and number 3.140000 .
+Toto je sloenský dátum 05 mája 2018 a číslo 3,140000 .
+Táto deska má  1.20 metra a váži 100 kilov.
+Dneska je 05.28.2018, a počasie vyzerá byť slnečno, ale nedal by som zato ani 2.50.
