@@ -647,5 +647,8 @@ public class TestNio {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        //TODO:str 491 Presenting new stream methods
+//        Files.lines
     }
 }
