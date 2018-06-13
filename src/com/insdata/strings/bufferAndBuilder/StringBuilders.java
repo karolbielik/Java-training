@@ -8,7 +8,7 @@ public class StringBuilders {
     //a nechceme skoncit pri velkom mnozstve nereferencovanych String objektov
 
     //je v jave od v. 5
-    //je synchronizovany takze je pomalsi ako StringBuffer
+    //StringBuffer nieje synchronizovany teda je rychlejsi ako StringBuffer
 
     public static void main(String[] args) {
         StringBuilder sb = new StringBuilder("abc");
