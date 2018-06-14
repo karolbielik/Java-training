@@ -10,7 +10,6 @@ import java.util.Locale;
 
 public class DatesFormatting {
     public static void main(String[] args) {
-        //TODO:formatovanie datumov
         /*---------------------------Formatovanie datumov--------------------------------------------------------------*/
         //preddefinovane formatery, vlastny formatter vid hore
         //------------------formatovanie pomocou preddefinovanych formaterov----------------------
