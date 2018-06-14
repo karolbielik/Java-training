@@ -45,6 +45,12 @@ public class NumberFormatting {
             System.out.println(pex.getMessage());
         }
 
+        NumberFormat us = NumberFormat.getInstance(Locale.US);
+        NumberFormat fr = NumberFormat.getInstance(Locale.FRANCE);
+        String s = "40.44";
+        System.out.println(us.parse(s));
+        System.out.println(fr.parse(s));
+
         //--------------------------------currency----------------------------------
         double price = 55;
         System.out.println(currencyFormat.format(price));//java doda EUR znak a desatinne cisla
