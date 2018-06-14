@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Date;
+import java.util.Locale;
 
 public class DatesFormatting {
     public static void main(String[] args) {
@@ -73,7 +74,14 @@ public class DatesFormatting {
         System.out.println(date); // 2015–01–02
         System.out.println(time);
 
-        //porovnanie stary sposob formatovania a novy
+        //------------------------------lokalizovany formater------------------------------------------
+        //-----------------------------------ofLocalizedDateTime()---------------------------------
+        DateTimeFormatter usFormatt = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).withLocale( Locale.US);
+        DateTimeFormatter frFormatt = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).withLocale( Locale.FRANCE);
+        System.out.println(usFormatt.format(dateTime.atZone(ZoneId.of("US/Eastern"))));
+        System.out.println(frFormatt.format(dateTime.atZone(ZoneId.of("Europe/Paris"))));
+
+        //-----------------------------------porovnanie stary sposob formatovania a novy-------------------------------
         //stary
         SimpleDateFormat sf = new SimpleDateFormat("hh:mm");
         //pracuje nad Date
