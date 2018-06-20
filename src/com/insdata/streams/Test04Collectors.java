@@ -86,7 +86,7 @@ public class Test04Collectors {
         * */
         //----------------------------------------partitioningBy---------------------------------------
         //vytvori mapu grup na zaklade specifikovaneho predikatu
-        //je podobne ako grouping, ale zgrupy elementy streamu do dvoch skupin na zakladen predicate funkcie
+        //je podobne ako grouping, ale zgrupi elementy streamu do dvoch skupin na zaklade predicate funkcie
         //na grupu true a false
         animals = supplyAnimals.get();
         Map<Boolean, List<String>> partinionedAnimals = animals.collect(Collectors.partitioningBy(
@@ -97,11 +97,13 @@ public class Test04Collectors {
 
         //----------------------------------summarizingDouble, summarizingInt, summarizingLong---------
         //vypocita priemer, max, min ...atd.
+
         //ak chceme v collect pouzit sumarizaciu Integer,Double,Long(nieje mutable) musime pouzit Collectors
         //streamOfNumbers = listOfNumbers.parallelStream();
         //System.out.println(streamOfNumbers.collect(Collectors.summarizingInt((i)-> i )));
         Stream<String> streamOfStringNumbers = Arrays.asList("2","3","4","5","6").parallelStream();
-        System.out.println(streamOfStringNumbers.collect(Collectors.summarizingInt((i)-> new Integer(i) )));
+        IntSummaryStatistics statistics = streamOfStringNumbers.collect(Collectors.summarizingInt((i)-> new Integer(i) ));
+        System.out.println(statistics);
 
         //-----------------------------------summingDouble, summingInt, summingLong--------------------
         //vypocita sumu pre primitivov v streame
