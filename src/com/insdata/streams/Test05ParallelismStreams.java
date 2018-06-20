@@ -49,7 +49,7 @@ public class Test05ParallelismStreams {
         /*
         1/prvy parameter identity combiner.apply(identity,u == u)
         2/druhy param. accumulator musi byt asociativny (a op b) op c == a op (b op c). op je operator.
-        3/treti param. combiner musi by asociativny combiner.apply(u,accumulator.apply(identity,t)) == accumulator.apply(u,t)
+        3/treti param. combiner musi byt asociativny combiner.apply(u,accumulator.apply(identity,t)) == accumulator.apply(u,t)
         */
         intStream = Stream.of(1,2,3,4,5,6,7,8);
         intStream.parallel().reduce(0, (a,b)-> a+b);//bude vracat rovnaky vysledok ako synchronny stream
@@ -57,7 +57,7 @@ public class Test05ParallelismStreams {
         intStream = streamIntegerSupplier.get();
         System.out.println("Paralelne odcitanie:"+
                 //tu je problem lebo odcitanie nieje asociativny operator
-                intStream.parallel().reduce(0, (a,b)-> {System.out.println("[a:]"+a+"[b:]"+b);System.out.println(); return a-b;})
+                intStream.parallel().reduce(0, (a,b)-> {System.out.println("["+Thread.currentThread().getName()+"][a:]"+a+"[b:]"+b);System.out.println(); return a-b;})
         );
         intStream = streamIntegerSupplier.get();
         System.out.println("Synchronne odcitanie:"+
@@ -71,14 +71,18 @@ public class Test05ParallelismStreams {
         );
         //--------------------------------------collect--------------------------------------------------------------
         //pre paraleleny pristup sluzi troj parametrovy collect
-        intStream = streamIntegerSupplier.get();
-        //v pripade paralelneho spracovania s a vykona aj treti parameter(combiner)
-        ArrayList<Double> res = intStream.parallel().collect(ArrayList<Double>::new,
+        intStream = Stream.of(1,3,2,8,5,6,4,7);//= streamIntegerSupplier.get();
+        //v pripade paralelneho spracovania sa vykona aj treti parameter(combiner)
+        //pomocou trojparametroveho collect sa robi paralelna redukcia, teda prvky vyslednej kolekcia su v rovnakom
+        //poradi ako prvky streamu.
+        // Math.pow(intStream[i]) == res[i], kde 0<i<=n-1, n=pocet prvkov v streame
+        ArrayList<Double> res = intStream.parallel()
+                .collect(ArrayList<Double>::new,
                 (list, elem)->list.add(Math.pow(elem,2)),
                 (list1, list2)->list1.addAll(list2)/*ArrayList::addAll*/ );
         System.out.println(res);
-        //Nato aby sme dosiahli paralelnu redukciu(v cielovej kolekcii su data v rovnakom poradi ako v streame)
-        // je potrebne splnit nasledovne
+        //Nato aby sme dosiahli pomocou Collectors paralelnu redukciu(v cielovej kolekcii su data v rovnakom poradi ako v streame)
+        // je potrebne splnit nasledovne:
         /*
         1/stream musi byt paralelny
         2/parameter colect operacie ma charakteristiku Collector.Characteristics.CONCURENT
