@@ -3,6 +3,7 @@ package com.insdata.dates;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Date;
@@ -11,7 +12,7 @@ import java.util.Locale;
 public class DatesFormatting {
     public static void main(String[] args) {
         /*---------------------------Formatovanie datumov--------------------------------------------------------------*/
-        //preddefinovane formatery, vlastny formatter vid hore
+        //preddefinovane formatery
         //------------------formatovanie pomocou preddefinovanych formaterov----------------------
         //ISO je standard pre datumi
         LocalDate date = LocalDate.of(2020, Month.JANUARY, 20);
@@ -79,7 +80,6 @@ public class DatesFormatting {
         DateTimeFormatter frFormatt = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL).withLocale( Locale.FRANCE);
         System.out.println(usFormatt.format(dateTime.atZone(ZoneId.of("US/Eastern"))));
         System.out.println(frFormatt.format(dateTime.atZone(ZoneId.of("Europe/Paris"))));
-
         //-----------------------------------porovnanie stary sposob formatovania a novy-------------------------------
         //stary
         SimpleDateFormat sf = new SimpleDateFormat("hh:mm");
@@ -88,7 +88,9 @@ public class DatesFormatting {
         //novy
         //pracuje nad LocalDate, LocalTime, LocalDateTime
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("hh:mm");
-        System.out.println(dtf.format(date));
+        System.out.println(dtf.format(time));
+        //alebo pomocou lokalizovaneho casu
+        dtf = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.FRANCE);
         System.out.println(dtf.format(time));
 
 

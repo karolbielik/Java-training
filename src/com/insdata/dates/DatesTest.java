@@ -1,5 +1,6 @@
 package com.insdata.dates;
 
+import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -46,14 +47,20 @@ public class DatesTest {
         System.out.println("DateTime of:"+LocalDateTime.of(customDatePonovom, customLocalTime));
 
         /*---------------------ZoneId, ZonedDateTime a casove zony------------------------------------------*/
-        //ZonedDateTime obsahuje datum, cas a casovu zonu
+        //ZonedDateTime obsahuje datum, cas a casovu zonu, ktora je v systemovych nastaveniach
         ZonedDateTime sysZdt = ZonedDateTime.now();
-        System.out.println("System time:"+sysZdt);
+        System.out.println("System zoned date time:"+sysZdt);
         //mozem vytvorit ZonedDateTime aj z LocalDateTime pridanim casovej zony
         ZonedDateTime jerusalemDateTime = ldt.atZone(ZoneId.of("Asia/Jerusalem"));
         System.out.println("Zoned datetime z localDateTime:"+jerusalemDateTime);
         //moja casova zona
         System.out.println("Moja casova zona:"+ZoneId.systemDefault());
+        //potom mozem jednoducho pretransformovat jeruzalemsky datetime na systemovy
+        //zmeni casovu zonu na systemovu, s tym, ze casovy okamih(instant) je ten isty, teda vysledny cas
+        //sa zobrazi posunuty relativne k systemovej zone
+        System.out.println("Systemove casove pasmo z jeruzalemskeho(rovnaky okamih):"+jerusalemDateTime.withZoneSameInstant(ZoneId.systemDefault()));
+        //zmeni casovu zonu na systemovu, s tym, ze vysledy cas sa ponecha nastaveny tak ako je povodny teda jeruzalemsky
+        System.out.println("Systemove casove pasmo z jeruzalemskeho(rozny okamih):"+jerusalemDateTime.withZoneSameLocal(ZoneId.systemDefault()));
         /*
         ZoneId(ofset od casovej zony Greenwich napr. +02:00(ZoneOffset)) identifikuje pravidla(Rules) konverzie Instant(je bod v case ratany od 1.1.1970)
         ZoneId ma dva tvary:
@@ -94,6 +101,30 @@ public class DatesTest {
                 .getDaylightSavings(LocalDateTime.of(2018,Month.DECEMBER,24, 12, 0).toInstant(ZoneOffset.UTC))
                 .toHours());
 
+        /*--------------------------------Casovy posun (daylight saving)----------------------------------------------*/
+        //Nie kazda krajina participuje. U nas sa cas presuva o hodinu dopredu v marci a o hodinu dozadu v novembry
+        //Potom jeden den v roku ma 23 hodin a druhy 25 hodin
+        //posun casu vpred
+        LocalDate date = LocalDate.of(2016, Month.MARCH, 13);
+        LocalTime time = LocalTime.of(1, 30);
+        ZoneId zone = ZoneId.of("US/Eastern");
+        ZonedDateTime dateTime = ZonedDateTime.of(date, time, zone);
+        System.out.println(dateTime);
+        dateTime = dateTime.plusHours(1);
+        System.out.println(dateTime);
+
+        //to iste plati pre posun casu vzad napr. 26.nov.2014 v Jeruzaleme
+        LocalDateTime jeruzalemDT = LocalDateTime.of(2014, Month.OCTOBER, 26, 1, 30);
+        ZonedDateTime jeruzalemZDT = jeruzalemDT.atZone(ZoneId.of("Asia/Jerusalem"));
+        //pri prechode na zimny cas v Jeruzaleme
+        System.out.println(jeruzalemZDT);
+        System.out.println(jeruzalemZDT.plusHours(1));
+
+        //pri prechode na letny cas v Jeruzaleme
+        jeruzalemZDT = ZonedDateTime.of(LocalDateTime.of(2014, Month.MARCH, 28, 1, 30), ZoneId.of("Asia/Jerusalem"));
+        System.out.println(jeruzalemZDT);
+        System.out.println(jeruzalemZDT.plusHours(1));
+
         /*------------------------------------------manipulacia s datumom---------------------------------------------*/
         LocalDateTime predManipulovanyDatum = LocalDateTime.now();
         System.out.println("pred manipulovanim pridavanie ponovom:"+predManipulovanyDatum);
@@ -129,10 +160,27 @@ public class DatesTest {
         cal.add(Calendar.SECOND, -5);
         System.out.println("po manipulacii uberanie postarom:"+cal.getTime());
 
+        //---------------------------porovnanie datumov-------------------------------------------
+        //----------------------------isBefore, isAfter-----------------------------------
+        System.out.println("Datum "+predManipulovanyDatum+" je pred datumom "+poManipulovanyDatum+" => "+predManipulovanyDatum.isBefore(poManipulovanyDatum));
+        System.out.println("Datum "+predManipulovanyDatum+" je po datume "+poManipulovanyDatum+" => "+predManipulovanyDatum.isAfter(poManipulovanyDatum));
+
+        //-------------------------withDayOfMonth, with...----------------------------
+        //nastavi prislusnu jednotku v datume na danu hodnotu
+        LocalDate ld1 = LocalDate.now();
+        //Napr. nastavi den v mesiaci na 2-heho withDayOfMonth
+        //Vrati kopiu datumu s dnami nastavenymi na konkretnu hodnotu
+        System.out.println(ld1.withDayOfMonth(2));
+
+        //--------------------------range-----------------------------
+        //vrati napr. min a max pocet dni v danom mesiaci, podla toho aky je ChronoField.xy parameter
+        ValueRange range = ld1.range(ChronoField.DAY_OF_MONTH);
+        System.out.println("min-max pocet dni v mesiaci "+ld1.getMonth()+" je "+range);
+
         //-------------------------epochSecond------------------------------------
         //je pocet sekund od 1.1.1970
         System.out.println("Od 1.1.1970 do "
-                +predManipulovanyDatum.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))
+                +predManipulovanyDatum
                 +" ubehlo sekund:"+predManipulovanyDatum.toEpochSecond(ZoneOffset.UTC));
 
         /*-----------------------------------------------perioda------------------------------------------------------*/
@@ -154,20 +202,11 @@ public class DatesTest {
 
         System.out.println("Tyzdne su reprezentovane ako dni:"+Period.ofWeeks(3));
 
-        /*-------------------------------nastavi den v mesiaci na 2-heho----------------------------------------------*/
-        //-------------------------withDayOfMonth----------------------------
-        LocalDate ld1 = LocalDate.now();
-        //vrati kopiu datumu s dnami nastavenymi na konkretnu hodnotu
-        System.out.println(ld1.withDayOfMonth(2));
 
-        //--------------------------range-----------------------------
-        //vrati napr. min a max pocet dni v danom mesiaci, podla toho aky je ChronoField.xy parameter
-        ValueRange range = ld1.range(ChronoField.DAY_OF_MONTH);
-        System.out.println("min-max pocet dni v mesiaci "+ld1.getMonth()+" je "+range);
 
         /*--------------------------------------------------duration--------------------------------------------------*/
         //Je casovy usek pre mensie casove jednotky ako je mesiac
-        //Ak chcem pouzit napr. 1 rok, tak by som mohol vytvorit duration = 265 dni, ale na to by som mal uz
+        //Ak chcem pouzit napr. 1 rok, tak by som mohol vytvorit duration = 365 dni, ale na to by som mal uz
         //pouzit Period
         //-------------------------vytvorenie duration---------------------------------
         //Tak ako pre Period tento vyraz nieje 1h 30minut ale 30 minut
@@ -221,7 +260,7 @@ public class DatesTest {
         //toto je OK
         System.out.println(localDate1.plus(period1));
         try {
-            //Duration ma casove jednotky a je urcena lenpre objekty s casovymi udajmi
+            //Duration ma casove jednotky a je urcena len pre objekty s casovymi udajmi
             System.out.println(localDate1.plus(duration));
             //To iste plati aj pre Period vo vztahu k LocalTime
             LocalTime localTime1 = LocalTime.now();
@@ -232,8 +271,11 @@ public class DatesTest {
         }
 
         /*-----------------------------------------------Instant-------------------------------------------------------*/
-        //Instant je okamih v case v ramci GMT casovych zon.
+        //Instant je okamih v case na casovej osi. Je mozne ho pouzit ako timestamp.
+        //je ciselnym vyjadrenim sekund od datumu epochy 1.1.1970
         Instant instantNow = Instant.now();
+        //sklada sa zo sekund (long) a nanosekund danej sekundy (int)
+        System.out.println("Od 1.1.1970 ubehlo "+ instantNow.getEpochSecond()+" sekund a "+instantNow.getNano()+" nanosekund");
         //ZonedDateTime - je mozne z neho dostat instant
         ZonedDateTime zonedDateTime = ZonedDateTime.now();
         Instant instantFromZDT = zonedDateTime.toInstant();
@@ -243,8 +285,8 @@ public class DatesTest {
         //casovy usek v ramci GMT casovych zon.
         System.out.println(instantFromZDT);
 
-        //da sa vsak spravit z epochy(cas od zaciatku pocitania(1970))
-        Instant instantFromEpoch = Instant.ofEpochSecond(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+        //potom mozem sql timestamp dostat z instant
+        System.out.println(Timestamp.from(instantNow));
 
         //K Instant dokazeme pridava alebo uberat hocijaku jednotku rovnu alebo mensiu ako den, ostatne su Unsupported
         //Vyhodia UnsupportedTemporalTypeException
@@ -254,31 +296,9 @@ public class DatesTest {
         System.out.println(instant.plus(1, ChronoUnit.DAYS));
         //nasledujuca hodina
         System.out.println(instant.plus(1, ChronoUnit.HOURS));
+        //viem instant pouzit aj na ziskanie duration medzi dvoma instants
+        System.out.println(Duration.between(instant, Instant.now()));
 
-        /*--------------------------------Casovy posun (daylight saving)----------------------------------------------*/
-        //Nie kazda krajina participuje. U nas sa cas presuva o hodinu dopredu v marci a o hodinu dozadu v novembri
-        //Potom jeden den v roku ma 23 hodin a druhy 25 hodin
-        //posun casu vpred
-        LocalDate date = LocalDate.of(2016, Month.MARCH, 13);
-        LocalTime time = LocalTime.of(1, 30);
-        ZoneId zone = ZoneId.of("US/Eastern");
-        ZonedDateTime dateTime = ZonedDateTime.of(date, time, zone);
-        System.out.println(dateTime);
-        dateTime = dateTime.plusHours(1);
-        System.out.println(dateTime);
-        //to iste plati pre posun casu vzad 6.nov.2016
-        dateTime = dateTime.minusHours(2);
-        System.out.println(dateTime);
 
-        LocalDateTime jeruzalemDT = LocalDateTime.of(2014, Month.OCTOBER, 26, 1, 30);
-        ZonedDateTime jeruzalemZDT = jeruzalemDT.atZone(ZoneId.of("Asia/Jerusalem"));
-        //pri prechode na zimny cas v Jeruzaleme
-        System.out.println(jeruzalemZDT);
-        System.out.println(jeruzalemZDT.plusHours(1));
-
-        //pri prechode na letny cas v Jeruzaleme
-        jeruzalemZDT = ZonedDateTime.of(LocalDateTime.of(2014, Month.MARCH, 28, 1, 30), ZoneId.of("Asia/Jerusalem"));
-        System.out.println(jeruzalemZDT);
-        System.out.println(jeruzalemZDT.plusHours(1));
     }
 }
