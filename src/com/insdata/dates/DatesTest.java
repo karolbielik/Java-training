@@ -86,6 +86,8 @@ public class DatesTest {
         //V Rules su napr. pravidla pre daylightsaving
         System.out.println("Jerusalem geografical region offset:"+ZoneId.of("Asia/Jerusalem").getRules().getOffset(Instant.now()));
         //-----------------------day light savings info------------------------
+        //Je to informaci zabudovana v jave, treba ju preto updatovat na aktualnu.
+        //Napr. pomocou TZUpdater
         System.out.println("UTC+03:00 terajsi posun casu:"+ZoneId.of("UTC+03:00").getRules()
                 .getDaylightSavings(Instant.now())
                 .toHours());
