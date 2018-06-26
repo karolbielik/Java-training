@@ -40,7 +40,7 @@ public class IfElseStatement {
 
         //hadanka
         //ku ktoremu if statmentu patri else statement
-        i=3;
+        i=5;
         if(i<4)
         if(i>2)
             System.out.println("i==3");
